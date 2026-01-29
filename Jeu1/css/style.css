@@ -1,0 +1,14 @@
+#Canvas {
+    border : 2px solid black;
+    background-color: powderblue;
+    border-radius: 20px;
+    display: block;
+    margin: 20px auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+
+
