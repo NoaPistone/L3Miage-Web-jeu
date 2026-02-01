@@ -1,7 +1,8 @@
 import Jeux from "./Jeux.js";
 
-const canvas = document.querySelector("#Canvas");
-const game = new Jeux(canvas);
+let canvas = document.querySelector("#Canvas");
+let game = new Jeux(canvas);
+game.init();
 game.start();
 
 

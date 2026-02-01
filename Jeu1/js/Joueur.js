@@ -4,17 +4,30 @@ export default class Joueur {
         this.y = y;
         this.size = 50;
         this.speed = 4;
+        this.angle = 0;
+        this.radius =this.size /2;
     }
 
     draw(ctx) {
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.save();
+        ctx.translate(this.x,this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = "purple";
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size/2, 0,Math.PI*2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(this.size /2,0);
+        ctx.strokeStyle ="black";
+        ctx.stroke();
+        ctx.restore();
+        
     }
 
     move() {
-    this.x += this.vx;
-    this.y += this.vy;
+        this.x += this.vx;
+        this.y += this.vy;
     }
-
-
 }

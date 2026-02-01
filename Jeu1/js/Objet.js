@@ -1,13 +1,11 @@
-export default class ObjetGraphique {
+export default class Objet {
     constructor(x,y,w,h,couleur) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        if(couleur !== undefined) {
-            this.couleur = couleur;
-        }
+        this.couleur = couleur;
     }
 
-
+    
 }
