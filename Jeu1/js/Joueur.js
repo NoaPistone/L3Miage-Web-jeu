@@ -12,7 +12,7 @@ export default class Joueur {
         ctx.save();
         ctx.translate(this.x,this.y);
         ctx.rotate(this.angle);
-        ctx.fillStyle = "purple";
+        ctx.fillStyle = "#b968d3";
         ctx.beginPath();
         ctx.arc(0, 0, this.size/2, 0,Math.PI*2);
         ctx.fill();

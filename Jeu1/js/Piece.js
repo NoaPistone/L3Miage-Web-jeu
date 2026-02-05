@@ -6,7 +6,7 @@ export default class Piece extends Objet {
     constructor(x,y,w,h,couleur) {
         super(x,y,w,h,couleur);
         this.size = w;
-        this.radius = w / 2;   // rayon pour la collision
+        this.radius = w / 2;   
 
     }
 

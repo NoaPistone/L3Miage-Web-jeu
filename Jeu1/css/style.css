@@ -1,9 +1,13 @@
 #Canvas {
     border : 2px solid black;
-    background-color: powderblue;
+    background: linear-gradient(to bottom, #7ae3df 0%, #fad0c4 100%);
     border-radius: 20px;
     display: block;
     margin: 20px auto;
+}
+
+body {
+    background-color: black;
 }
 
 h1 {
