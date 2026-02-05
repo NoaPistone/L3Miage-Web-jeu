@@ -127,8 +127,8 @@ export default class Jeux {
     
 
     update() {
-        /*this.obstacles.forEach(o => o.update && o.update());*/
-        this.obstacles.forEach
+        this.obstacles.forEach(o => o.update && o.update());
+        
         this.deplacementJoueur();
         this.collisionObstacle();
         this.collisionPieces();
