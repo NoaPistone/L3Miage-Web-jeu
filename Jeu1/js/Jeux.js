@@ -5,7 +5,7 @@ import Sortie from "./Sortie.js";
 import { initListeners } from "./ecouteurs.js";
 import { drawScore } from "./utils.js";
 import Menu from "./etats/menu.js";
-import GameOver from "./etats/gameOver.js";
+import GameOver from "./etats/GameOver.js";
 
 
 
@@ -16,6 +16,9 @@ export default class Jeux {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
+        
+        this.piecesParNiveau = {};
+        this.scoreDebutNiveau = 0;
 
         this.inputStates = {
             ArrowUp: false,
@@ -32,12 +35,22 @@ export default class Jeux {
         this.fin = new GameOver(this.canvas, this.ctx, this);
         this.pieceMessageTimer = 0;
 
+        //Pour l'instant j'arrive à le faire fonctionner dans ecouteurs.js mais à long terme faudra mettre la bas
+        this.canvas.addEventListener("click", (e) => {
+        const rect = this.canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+        const my = (e.clientY - rect.top) * (this.canvas.height / rect.height);
 
+  if (this.etat === "GAME OVER") {
+    this.fin.handleClick(mx, my);
+  }
+});
     }
 
     init() {
         this.sortieActive = false;
-        this.showPieceMessage = false;
+        this.showPieceMessage = true;
+        this.pieceMessageTimer = Date.now();
         this.joueur = new Joueur(30, 30);
         this.obstacles = [];
         this.pieces = [];
@@ -53,10 +66,16 @@ export default class Jeux {
     objetNiveau(niveau) {
         this.obstacles = [];
         this.pieces = [];
+        this.scoreDebutNiveau = this.score;
+
+        this.piecesParNiveau[niveau] = [];
+        const addPiece = (x, y, w, h, color) => {
+            this.pieces.push(new Piece(x, y, w, h, color));
+            this.piecesParNiveau[niveau].push({ x, y, w, h, color });
+        };
+
         if (niveau == 1) {
             console.log("création obstacles/pièces de niveau 1");
-            this.showPieceMessage = true;
-            this.pieceMessageTimer = Date.now();
             this.sortieActive = false;
 
             this.obstacles.push(new Obstacle(141, 0, 33, 439, "black"));
@@ -65,11 +84,11 @@ export default class Jeux {
             this.obstacles.push(new Obstacle(249, 17, 249, 33, "black"));
             this.obstacles.push(new Obstacle(414, 166, 124, 33, "black", "horizontal", 2, 348, 580));
             this.obstacles.push(new Obstacle(83, 505, 249, 33, "black"));
-            this.pieces.push(new Piece(166, 456, 17, 17, "yellow"));
-            this.pieces.push(new Piece(124, 133, 17, 17, "yellow"));
-            this.pieces.push(new Piece(555, 17, 17, 17, "yellow"));
-            this.pieces.push(new Piece(555, 398, 17, 17, "yellow"));
-            this.pieces.push(new Piece(249, 555, 17, 17, "yellow"));
+             addPiece(166, 456, 17, 17, "yellow");
+            addPiece(124, 133, 17, 17, "yellow");
+            addPiece(555, 17, 17, 17, "yellow");
+            addPiece(555, 398, 17, 17, "yellow");
+            addPiece(249, 555, 17, 17, "yellow");
 
 
             this.sortie = new Sortie(500, 500, 120, 120, "white");
@@ -85,12 +104,12 @@ export default class Jeux {
             this.obstacles.push(new Obstacle(456, 149, 33, 331, "black", 'vertical', 2, 149, 580));
             this.obstacles.push(new Obstacle(191, 75, 331, 17, "black"));
             this.obstacles.push(new Obstacle(108, 564, 422, 25, "black", "horizontal", 1, 100, 580));
-            this.pieces.push(new Piece(555, 25, 17, 17, "yellow"));
-            this.pieces.push(new Piece(414, 124, 17, 17, "yellow"));
-            this.pieces.push(new Piece(124, 331, 17, 17, "yellow"));
-            this.pieces.push(new Piece(439, 199, 17, 17, "yellow"));
-            this.pieces.push(new Piece(555, 564, 17, 17, "yellow"));
-            this.pieces.push(new Piece(41, 414, 17, 17, "yellow"));
+            addPiece(555, 25, 17, 17, "yellow");
+            addPiece(414, 124, 17, 17, "yellow");
+            addPiece(124, 331, 17, 17, "yellow");
+            addPiece(439, 199, 17, 17, "yellow");
+            addPiece(555, 564, 17, 17, "yellow");
+            addPiece(41, 414, 17, 17, "yellow");
 
             // Sortie
             this.sortie = new Sortie(0, 481, 99, 99, "white");
@@ -245,6 +264,8 @@ export default class Jeux {
                 this.joueur.x = 30;
                 this.joueur.y = 30;
 
+                this.resetPiecesDuNiveau();
+
                 console.log("Obstacle touché, vies restante :", this.vies, "score :", this.score);
             }
         });
@@ -282,5 +303,13 @@ export default class Jeux {
             this.objetNiveau(this.niveau);
         }
     }
+
+    resetPiecesDuNiveau() {
+        const cfg = this.piecesParNiveau[this.niveau];
+            if (!cfg) return;
+
+        this.pieces = cfg.map(p => new Piece(p.x, p.y, p.w, p.h, p.color));
+        this.sortieActive = false;
+  }
 }
 
