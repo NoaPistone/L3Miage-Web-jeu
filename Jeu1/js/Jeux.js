@@ -91,7 +91,10 @@ export default class Jeux {
             addPiece(249, 555, 17, 17, "yellow");
 
 
-            this.sortie = new Sortie(500, 500, 120, 120, "white");
+            const size = 120;
+            this.sortie = new Sortie(this.canvas.width - size, this.canvas.height - size, size, size);
+
+
 
         }
 
@@ -193,7 +196,7 @@ export default class Jeux {
 
     drawObjets() {
         this.joueur.draw(this.ctx);
-        this.sortie.draw(this.ctx);
+        this.sortie.draw(this.ctx, this.sortieActive);
         this.obstacles.forEach(obj => {
             obj.draw(this.ctx);
         });
@@ -298,6 +301,7 @@ export default class Jeux {
             this.niveau++;
             console.log("niveau :", this.niveau);
 
+            this.vies = 5;
             this.joueur.x = 30;
             this.joueur.y = 30;
             this.objetNiveau(this.niveau);
