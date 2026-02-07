@@ -266,7 +266,7 @@ export default class Jeux {
                 this.vies--;
                 this.joueur.x = 30;
                 this.joueur.y = 30;
-
+                this.score = this.scoreDebutNiveau;
                 this.resetPiecesDuNiveau();
 
                 console.log("Obstacle touché, vies restante :", this.vies, "score :", this.score);
@@ -301,7 +301,7 @@ export default class Jeux {
             this.niveau++;
             console.log("niveau :", this.niveau);
 
-            this.vies = 5;
+            
             this.joueur.x = 30;
             this.joueur.y = 30;
             this.objetNiveau(this.niveau);
@@ -314,6 +314,7 @@ export default class Jeux {
 
         this.pieces = cfg.map(p => new Piece(p.x, p.y, p.w, p.h, p.color));
         this.sortieActive = false;
+        
   }
 }
 
