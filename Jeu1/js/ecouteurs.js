@@ -46,7 +46,7 @@ function initListeners(inputStates,canvas,jeux) {
                 jeux.fin.handleClick(mx, my);
                 break;
             case "JEU TERMINE":
-                jeux.JeuTermine.handleClick?.(mx, my); // si jamais tu veux un clic sur écran final
+                jeux.JeuTermine.handleClick(mx, my); // si jamais tu veux un clic sur écran final
                 break;
         }
     };
