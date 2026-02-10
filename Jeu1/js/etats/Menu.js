@@ -25,7 +25,7 @@ export default class Menu {
         this.ctx.fillStyle = grad;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "white";
-        this.ctx.font = "bold 50px 'Verdana', sans-serif";
+        this.ctx.font = "bold 50px 'Bungee', sans-serif";
         this.ctx.textAlign = "center";
         this.ctx.shadowColor = "rgba(0,0,0,0.5)";
         this.ctx.shadowBlur = 10;
@@ -42,7 +42,7 @@ export default class Menu {
         );
 
         this.ctx.fillStyle = "white";
-        this.ctx.font = "bold 30px 'Verdana', sans-serif";
+        this.ctx.font = "bold 30px 'Bungee', sans-serif";
         this.ctx.fillText(
             "DÉMARRER",
             this.bouton.x + this.bouton.w / 2,
@@ -54,7 +54,8 @@ export default class Menu {
 
     handleClick(event) {
         console.log("CLICK DETECTÉ");
-        this.jeux.etat = "JEU EN COURS";
+        //this.jeux.etat = "JEU EN COURS";
+        if (this.jeux.etat !== "MENU D'ACCUEIL") return;
         let rect = this.canvas.getBoundingClientRect();
         let mx = event.clientX - rect.left;
         let my = event.clientY - rect.top;

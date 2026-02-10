@@ -23,7 +23,9 @@ export default class Sortie {
     ctx.save();
 
     // option rendre plus sombre si pas active
-    ctx.globalAlpha = active ? 1 : 0.45;
+    //ctx.globalAlpha = active ? 1 : 0.45;
+    ctx.globalAlpha = 1 ;
+
 
     if (imgLoaded) {
       // cover (remplit le carré sans déformer)

@@ -15,7 +15,7 @@ export default class GameOver {
     this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "white";
-    this.ctx.font = "bold 50px 'Verdana', sans-serif";
+    this.ctx.font = "bold 50px 'Bungee', sans-serif";
     this.ctx.textAlign = "center";
     this.ctx.shadowColor = "rgba(0,0,0,0.5)";
     this.ctx.shadowBlur = 10;
@@ -34,7 +34,7 @@ export default class GameOver {
     this.ctx.lineWidth = 3;
     this.ctx.strokeRect(x, y, w, h);
     this.ctx.fillStyle = "black";
-    this.ctx.font = "bold 28px Verdana";
+    this.ctx.font = "bold 28px Bungee";
     this.ctx.textBaseline = "middle";
     this.ctx.fillText("Rejouer", this.canvas.width / 2, y + h / 2);
     this.ctx.restore();

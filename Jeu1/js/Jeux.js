@@ -148,7 +148,7 @@ export default class Jeux {
         }
 
         if (niveau == 5) {
-            this.obstacles.push(new Obstacle(83, 0, 25, 248, "black", "vertical", 3, 0, 373));
+            this.obstacles.push(new Obstacle(83, 0, 25, 248, "black", "vertical", 2, 0, 373));
             this.obstacles.push(new Obstacle(0, 456, 456, 25, "black"));
             this.obstacles.push(new Obstacle(83, 248, 290, 25, "black"));
             this.obstacles.push(new Obstacle(0, 356, 373, 25, "black", "horizontal", 2, 0, 456));
@@ -212,11 +212,29 @@ export default class Jeux {
         requestAnimationFrame(this.AnimationLoop.bind(this));
     }
 
-    AnimationLoop() {
+    /*AnimationLoop() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.etat === "MENU D'ACCUEIL") {
             this.menu.draw();
         } else if (this.etat === "JEU EN COURS") {
+            this.update();
+            this.drawObjets();
+        } else if (this.etat === "GAME OVER") {
+            this.fin.draw();
+        } else if (this.etat=== "JEU TERMINE") {
+            this.JeuTermine.draw();
+        }
+
+
+        requestAnimationFrame(this.AnimationLoop.bind(this));
+    }*/
+
+    AnimationLoop() {
+        if (this.etat === "MENU D'ACCUEIL") {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.menu.draw();
+        } else if (this.etat === "JEU EN COURS") {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.update();
             this.drawObjets();
         } else if (this.etat === "GAME OVER") {
@@ -328,7 +346,7 @@ export default class Jeux {
 
 
                 this.ctx.fillStyle = "black";
-                this.ctx.font = "20px Arial";
+                this.ctx.font = "20px Bungee";
                 this.ctx.textAlign = "center";
                 this.ctx.textBaseline = "middle";
                 this.ctx.fillText("Toutes les pièces doivent être collectées !", this.canvas.width / 2, this.canvas.height / 2);
@@ -446,7 +464,7 @@ export default class Jeux {
 
     drawTimer() {
         this.ctx.fillStyle = "white";
-        this.ctx.font = "20px Arial";
+        this.ctx.font = "20px Bungee";
         this.ctx.fillText("Temps : " + this.getTempsActuel() + " s", 20, 30);
     }
 

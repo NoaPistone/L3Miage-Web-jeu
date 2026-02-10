@@ -10,7 +10,7 @@ function drawScore(ctx,canvas,score,niveau,vies) {
     ctx.strokeRect(centerX - width/2, 5, width, height);
 
     ctx.fillStyle = "#ffffff"; 
-    ctx.font = "bold 20px 'Verdana', sans-serif";
+    ctx.font = "bold 20px 'Bungee', sans-serif";
     ctx.textAlign = "center"; 
     ctx.shadowColor = "rgba(0,0,0,0.7)";
     ctx.shadowBlur = 5;
