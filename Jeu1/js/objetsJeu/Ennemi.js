@@ -26,7 +26,7 @@ export default class Ennemi extends Objet {
             this.x += nx * this.vitesse;
             this.y += ny * this.vitesse;
 
-            // rotation vers le joueur
+            
             this.angle = Math.atan2(ny, nx);
         }
     }
@@ -49,29 +49,12 @@ export default class Ennemi extends Objet {
 
     draw(ctx) {
         ctx.save();
-
-        // positionnement
         ctx.translate(this.x, this.y);
-
-        // orientation
         ctx.rotate(this.angle);
-
-        // dessin en (0,0)
         ctx.fillStyle = this.couleur;
         ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
-
-        // repère visuel (direction)
         //ctx.fillStyle = "black";
         //ctx.fillRect(this.w / 4, -4, 8, 8);
-
         ctx.restore();
-
-        /*// zone d’activation (debug)
-        ctx.save();
-        ctx.strokeStyle = "rgba(255,0,0,0.3)";
-        ctx.beginPath();
-        ctx.arc(this.baseX, this.baseY, this.zone, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();*/
     }
 }

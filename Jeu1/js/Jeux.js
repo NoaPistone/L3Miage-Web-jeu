@@ -9,6 +9,7 @@ import Menu from "./etats/menu.js";
 import GameOver from "./etats/GameOver.js";
 import BtnDebloqueSortie from "./objetsJeu/BtnDebloqueSortie.js";
 import JeuTermine from "./etats/JeuTermine.js";
+import Transition from "./etats/Transition.js";
 
 let debug = 3;
 
@@ -43,6 +44,7 @@ export default class Jeux {
         this.menu = new Menu(this.canvas, this.ctx, this);
         this.fin = new GameOver(this.canvas, this.ctx, this);
         this.JeuTermine = new JeuTermine(this.canvas,this.ctx,this);
+        this.transition = new Transition(this.canvas,this.ctx,this);
 
         //Pour l'instant j'arrive à le faire fonctionner dans ecouteurs.js mais à long terme faudra mettre la bas
         /*this.canvas.addEventListener("click", (e) => {
@@ -223,6 +225,8 @@ export default class Jeux {
             this.fin.draw();
         } else if (this.etat=== "JEU TERMINE") {
             this.JeuTermine.draw();
+        } else if (this.etat === "TRANSITION") {
+            this.transition.draw();
         }
 
 
@@ -254,7 +258,7 @@ export default class Jeux {
             this.etat = "GAME OVER";
             console.log("jeu terminé");
         }
-        if (this.niveau >= 6) {
+        if (this.niveau >= 6 && this.btn) {
             if (this.btn.actif && this.btn.estAtteint(this.joueur)) {
                 this.btn.desactiver();
                 const index = this.obstacles.indexOf(this.obsSupp);
@@ -299,7 +303,7 @@ export default class Jeux {
         this.joueur.draw(this.ctx);
         this.sortie.draw(this.ctx, this.sortieActive);
         this.ennemis.forEach(e => e.draw(this.ctx));
-        if (this.niveau >= 6) {
+        if (this.niveau >= 6 && this.btn) {
             this.btn.draw(this.ctx);
         }
 
@@ -353,7 +357,7 @@ export default class Jeux {
                     this.score = this.scoreDebutNiveau;
                     this.resetPiecesDuNiveau();
                     console.log("Obstacle touché, vies restante :", this.vies, "score :", this.score);
-                }
+                } 
             }
         });
     }
@@ -369,29 +373,25 @@ export default class Jeux {
             return true;
         });
 
-        if (this.niveau === 1 && this.pieces.length === 0) {
+        /*if (this.niveau === 1 && this.pieces.length === 0) {
             this.sortieActive = true;
             this.showPieceMessage = false;
-        }
+        }*/
     }
 
     collisionSortie() {
         if (this.sortie.estAtteint(this.joueur)) {
             if (this.niveau < 7) {
                 this.arreterTimer();
-                /*if (this.niveau === 1 && !this.sortieActive) {
-                    console.log("Vous devez d'abord collecter toutes les pièces !");
-                    return;
-                }*/ // mettre ca plus tard pour plus de difficulté
                 console.log("Sortie atteinte");
                 this.niveau++;
                 console.log("niveau :", this.niveau);
-                this.demarrerTimer();
+                //this.demarrerTimer();
+                this.etat = "TRANSITION";
 
-
-                this.joueur.x = 30;
-                this.joueur.y = 30;
-                this.objetNiveau(this.niveau);
+                //this.joueur.x = 30;
+                //this.joueur.y = 30;
+                //this.objetNiveau(this.niveau);
 
             } else {
                 this.arreterTimer();

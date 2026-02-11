@@ -1,3 +1,4 @@
+
 function initListeners(inputStates,canvas,jeux) {
 
     window.onkeydown = (event) => {
@@ -46,8 +47,12 @@ function initListeners(inputStates,canvas,jeux) {
                 jeux.fin.handleClick(mx, my);
                 break;
             case "JEU TERMINE":
-                jeux.JeuTermine.handleClick(mx, my); // si jamais tu veux un clic sur écran final
+                jeux.JeuTermine.handleClick(mx, my); 
                 break;
+            case "TRANSITION" :
+                jeux.transition.handleClick(mx,my);
+                break;
+
         }
     };
 }

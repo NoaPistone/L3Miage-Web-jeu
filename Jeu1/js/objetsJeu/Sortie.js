@@ -12,8 +12,8 @@ export default class Sortie {
     this.y = y;
 
     // compat si ailleurs tu utilises w/h ou width/height
-    this.width = width;  this.height = height;
-    this.w = width;      this.h = height;
+    this.width = width; this.height = height;
+    this.w = width; this.h = height;
   }
 
   draw(ctx, active = true) {
@@ -21,14 +21,10 @@ export default class Sortie {
     const h = this.height ?? this.h;
 
     ctx.save();
-
-    // option rendre plus sombre si pas active
-    //ctx.globalAlpha = active ? 1 : 0.45;
-    ctx.globalAlpha = 1 ;
+    ctx.globalAlpha = 1;
 
 
     if (imgLoaded) {
-      // cover (remplit le carré sans déformer)
       const scale = Math.max(w / imgSortie.width, h / imgSortie.height);
       const dw = imgSortie.width * scale;
       const dh = imgSortie.height * scale;
@@ -37,7 +33,6 @@ export default class Sortie {
 
       ctx.drawImage(imgSortie, dx, dy, dw, dh);
     } else {
-      // fallback si l'image n'est pas encore chargée
       ctx.strokeStyle = "white";
       ctx.lineWidth = 3;
       ctx.strokeRect(this.x, this.y, w, h);
@@ -46,7 +41,7 @@ export default class Sortie {
     ctx.restore();
   }
 
-  // collision joueur (cercle) vs sortie (rectangle)
+
   estAtteint(joueur) {
     const w = this.width ?? this.w;
     const h = this.height ?? this.h;
