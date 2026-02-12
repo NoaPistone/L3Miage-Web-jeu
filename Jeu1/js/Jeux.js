@@ -9,7 +9,7 @@ import Menu from "./etats/menu.js";
 import GameOver from "./etats/GameOver.js";
 import BtnDebloqueSortie from "./objetsJeu/BtnDebloqueSortie.js";
 import JeuTermine from "./etats/JeuTermine.js";
-//import Transition from "./etats/Transition.js";
+import Transition from "./etats/Transition.js";
 
 let debug = 3;
 
@@ -44,7 +44,7 @@ export default class Jeux {
         this.menu = new Menu(this.canvas, this.ctx, this);
         this.fin = new GameOver(this.canvas, this.ctx, this);
         this.JeuTermine = new JeuTermine(this.canvas,this.ctx,this);
-        //////this.transition = new Transition(this.canvas,this.ctx,this);
+        this.transition = new Transition(this.canvas,this.ctx,this);
 
         //Pour l'instant j'arrive à le faire fonctionner dans ecouteurs.js mais à long terme faudra mettre la bas
         /*this.canvas.addEventListener("click", (e) => {
@@ -387,11 +387,11 @@ export default class Jeux {
                 this.niveau++;
                 console.log("niveau :", this.niveau);
                 this.demarrerTimer(); // à enlever
-                /////this.etat = "TRANSITION";
+                this.etat = "TRANSITION";
 
-                this.joueur.x = 30; // a enlever
-                this.joueur.y = 30; // a enlever
-                this.objetNiveau(this.niveau); // a enlever
+                //this.joueur.x = 30; // a enlever
+                //this.joueur.y = 30; // a enlever
+                //this.objetNiveau(this.niveau); // a enlever
 
             } else {
                 this.arreterTimer();
