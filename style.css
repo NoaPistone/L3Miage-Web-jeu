@@ -28,7 +28,7 @@ header nav {
     padding: 20px 4%;
 }
 
-.logo img { height: 50px; }
+.logo img { height: 100px; }
 
 .nav-links {
     display: flex;
