@@ -1,24 +1,30 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+const canvas = document.getElementById("renderCanvas");
+const engine = new Engine(canvas, true);
 
-setupCounter(document.querySelector('#counter'))
+const createScene = () => {
+    const scene = new Scene(engine);
+
+    // 1. La Caméra (elle tourne autour du centre 0,0,0)
+    const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 3, 5, Vector3.Zero(), scene);
+    camera.attachControl(canvas, true);
+
+    // 2. La Lumière (pour voir les volumes)
+    new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+
+    // 3. LA BOULE (au milieu de rien)
+    MeshBuilder.CreateSphere("maBoule", { diameter: 2 }, scene);
+
+    return scene;
+};
+
+const scene = createScene();
+
+engine.runRenderLoop(() => {
+    scene.render();
+});
+
+window.addEventListener("resize", () => {
+    engine.resize();
+});
