@@ -1,0 +1,6 @@
+[submodule "ProjetsWebMIAGEL3"]
+	path = ProjetsWebMIAGEL3
+	url = https://github.com/BiljanaDjo/ProjetsWebMIAGEL3.git
+[submodule "jeucanva"]
+	path = jeucanva
+	url = https://github.com/BiljanaDjo/ProjetsWebMIAGEL3.git
