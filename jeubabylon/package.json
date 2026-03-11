@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:force": "vite --force",
+    "dev:clean": "rm -rf node_modules/.vite && vite --force",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -13,6 +15,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "^8.54.0",
+    "@babylonjs/gui": "^8.54.1",
     "@babylonjs/loaders": "^8.54.0"
   }
 }

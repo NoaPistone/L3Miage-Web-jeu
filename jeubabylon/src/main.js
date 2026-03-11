@@ -1,5 +1,6 @@
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3 } from "@babylonjs/core";
 import { Joueur } from "./joueur"; 
+import { addSkybox, addGround, setupLightingAndFog } from "./scene";
 
 const canvas = document.getElementById("renderCanvas");
 const engine = new Engine(canvas, true);
@@ -12,7 +13,7 @@ const createScene = () => {
     camera.attachControl(canvas, true);
     
     new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-
+    
     // On crée l'instance du joueur
     const monJoueur = new Joueur(scene);
 
@@ -20,6 +21,9 @@ const createScene = () => {
 };
 
 const { scene, monJoueur } = createScene();
+addSkybox(scene);
+addGround(scene);
+setupLightingAndFog(scene);
 
 engine.runRenderLoop(() => {
     monJoueur.update(); // CRUCIAL : calcule le mouvement avant le rendu
