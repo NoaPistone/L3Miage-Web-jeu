@@ -25,6 +25,7 @@ addSkybox(scene);
 addGround(scene);
 setupLightingAndFog(scene);
 
+
 engine.runRenderLoop(() => {
     monJoueur.update(); // CRUCIAL : calcule le mouvement avant le rendu
     scene.render();
