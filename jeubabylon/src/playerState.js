@@ -1,4 +1,4 @@
-export const PlayerState = Object.freeze({
+export const JoueurState = Object.freeze({
     IDLE: "idle",
     WALK_FORWARD: "walk_forward",
     WALK_BACKWARD: "walk_backward",
