@@ -1,4 +1,6 @@
-import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3  } from "@babylonjs/core";
+import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3, SceneLoader } from "@babylonjs/core";
+import "@babylonjs/loaders";
+import { Joueur } from "./joueur.js"; 
 
 export function addSkybox(scene) {
     // Création du cube géant
@@ -24,10 +26,52 @@ export function addSkybox(scene) {
     skybox.material = skyboxMaterial;
 }
 
-export function addGround(scene) {
+export async function addGround(scene) {
+    const groundUrl = new URL("./assets/textures/ground.glb", import.meta.url).href;
+
+    try {
+        const result = await SceneLoader.ImportMeshAsync("", "", groundUrl, scene);
+        const groundRoot = result.meshes[0];
+
+        // 1. On récupère les dimensions réelles du modèle GLB
+        const boundingInfo = groundRoot.getHierarchyBoundingVectors();
+        const currentWidth = boundingInfo.max.x - boundingInfo.min.x;
+        const currentDepth = boundingInfo.max.z - boundingInfo.min.z;
+
+        // 2. On définit la taille souhaitée (Labyrinthe 40 + Marge 4 = 44)
+        const targetSize = 44; 
+
+        // 3. Calcul du ratio
+        const scaleX = currentWidth !== 0 ? targetSize / currentWidth : 1;
+        const scaleZ = currentDepth !== 0 ? targetSize / currentDepth : 1;
+
+        // 4. Application du scaling
+        groundRoot.scaling = new Vector3(scaleX, 1, scaleZ);
+
+        // Centrage parfait à l'origine
+        groundRoot.position = new Vector3(0, 0, 0);
+
+        // Configuration des collisions et du rendu
+        result.meshes.forEach(mesh => {
+            mesh.checkCollisions = true;
+            if (mesh.material) {
+                // On retire la brillance pour un aspect plus réaliste
+                mesh.material.specularColor = new Color3(0, 0, 0);
+            }
+        });
+
+        console.log(`Sol GLB redimensionné à ${targetSize}x${targetSize}`);
+        return groundRoot;
+
+    } catch (error) {
+        console.error("Erreur lors du chargement du sol GLB :", error);
+    }
+}
+
+export function addGround1(scene) {
     const ground = MeshBuilder.CreateGround(
         "ground",
-        { width: 30, height: 30 },
+        { width: 40, height: 40 },
         scene
     );
 
@@ -46,6 +90,7 @@ export function addGround(scene) {
 
 
 
+
 export function setupLightingAndFog(scene) {
     // Lumière faible
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
@@ -57,3 +102,4 @@ export function setupLightingAndFog(scene) {
     ////scene.fogDensity = 0.02;
     ////scene.fogColor = new Color3(0.02, 0.02, 0.02);
 }
+
