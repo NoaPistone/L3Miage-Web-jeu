@@ -4,6 +4,8 @@ import { addSkybox, addGround, setupLightingAndFog } from "./scene";
 
 const canvas = document.getElementById("renderCanvas");
 const engine = new Engine(canvas, true);
+engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
+engine.adaptToDeviceRatio = true;
 
 const createScene = () => {
     const scene = new Scene(engine);
@@ -11,6 +13,7 @@ const createScene = () => {
     // Caméra de côté pour bien voir le mouvement
     const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 3, 10, Vector3.Zero(), scene);
     camera.attachControl(canvas, true);
+    engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
     
     new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     
