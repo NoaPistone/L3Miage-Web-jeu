@@ -42,10 +42,10 @@ export class Joueur {
         this._setupMouseLook();
 
         this.camera = new UniversalCamera(
-            "fpsCamera",
-            new Vector3(0, 1.58, -0.08),
-            this.scene
-        );
+    "fpsCamera",
+    new Vector3(0, 0.78, 0.17),
+    this.scene
+);
 
         this.camera.minZ = 0.05;
         this.camera.fov = 1.1;
@@ -97,8 +97,6 @@ export class Joueur {
 
     async _chargerModele() {
     try {
-        console.log("=== DEBUT CHARGEMENT character.glb ===");
-
         const result = await SceneLoader.ImportMeshAsync(
             "",
             "/assets/",
@@ -107,87 +105,42 @@ export class Joueur {
         );
 
         console.log("=== MODELE CHARGE ===");
-        console.log("Nombre de meshes :", result.meshes.length);
-        console.log("Nombre de skeletons :", result.skeletons.length);
-        console.log("Meshes bruts :", result.meshes);
+        console.log("Meshes :", result.meshes.map(m => m.name));
 
-        console.log("=== LISTE DES MESHES ===");
-        result.meshes.forEach((mesh, index) => {
-            console.log(index, {
-                name: mesh.name,
-                id: mesh.id,
-                isVisible: mesh.isVisible,
-                parent: mesh.parent ? mesh.parent.name : null,
-                position: mesh.position ? mesh.position.clone() : null
-            });
-        });
+        const importedRoot = result.meshes[0];   // __root__
+        const bodyMesh = result.meshes[1];       // Ch24
 
-        // Sélection du mesh principal
-        this.root = result.meshes.find(mesh => mesh.name !== "__root__") || result.meshes[0];
+        this.root = importedRoot;
+        this.bodyMesh = bodyMesh;
 
-        console.log("=== ROOT SELECTIONNE ===");
-        console.log("root.name =", this.root?.name);
-        console.log("root.id =", this.root?.id);
-
-        // Bounding box avant modifs
-        if (this.root?.getHierarchyBoundingVectors) {
-            const boundsBefore = this.root.getHierarchyBoundingVectors();
-            console.log("Bounds avant parentage :", boundsBefore);
-        }
-
-        // Parentage au collider
+        // On garde toute la hiérarchie importée
         this.root.parent = this.collider;
         this.root.scaling = new Vector3(1, 1, 1);
-        this.root.position = new Vector3(0, -0.9, 0.08);
+        this.root.position = new Vector3(0, -0.9, 0);
         this.root.rotationQuaternion = null;
         this.root.rotation = new Vector3(0, 0, 0);
 
-        console.log("=== APRES PARENTAGE ===");
+        if (result.skeletons && result.skeletons.length > 0) {
+            this.skeleton = result.skeletons[0];
+        }
+
+        // DEBUG VISUEL
+        this.bodyMesh.isVisible = true;
+        this.bodyMesh.setEnabled(true);
+        this.bodyMesh.showBoundingBox = false;
+
+        if (this.bodyMesh.material) {
+            this.bodyMesh.material.backFaceCulling = false;
+        }
+
+        console.log("root =", this.root.name);
+        console.log("bodyMesh =", this.bodyMesh.name);
         console.log("collider.position =", this.collider.position.clone());
         console.log("camera.localPosition =", this.camera.position.clone());
         console.log("root.localPosition =", this.root.position.clone());
-        console.log("root.parent =", this.root.parent ? this.root.parent.name : null);
-
-        if (result.skeletons && result.skeletons.length > 0) {
-            this.skeleton = result.skeletons[0];
-            console.log("Skeleton sélectionné :", this.skeleton.name);
-        }
-
-        // Log des meshes qui vont être cachés
-        console.log("=== MESHES CACHES POUR LA VUE FPS ===");
-        result.meshes.forEach((mesh) => {
-            const name = mesh.name.toLowerCase();
-
-            const shouldHide =
-                name.includes("head") ||
-                name.includes("eye") ||
-                name.includes("hair") ||
-                name.includes("face") ||
-                name.includes("mask") ||
-                name.includes("helmet");
-
-            if (shouldHide) {
-                console.log("HIDE ->", mesh.name);
-                mesh.isVisible = false;
-            } else {
-                console.log("KEEP ->", mesh.name);
-            }
-        });
-
-        // Etat final utile
-        console.log("=== ETAT FINAL ROOT ===");
-        console.log({
-            rootName: this.root.name,
-            rootVisible: this.root.isVisible,
-            rootEnabled: this.root.isEnabled(),
-            rootLocalPosition: this.root.position.clone(),
-            colliderPosition: this.collider.position.clone(),
-            cameraLocalPosition: this.camera.position.clone()
-        });
+        console.log("body absolute position =", this.bodyMesh.getAbsolutePosition().clone());
 
         this.isLoaded = true;
-        console.log("=== FIN CHARGEMENT JOUEUR ===");
-
     } catch (error) {
         console.error("Erreur chargement character.glb :", error);
     }
