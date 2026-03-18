@@ -10,6 +10,7 @@ const engine = new Engine(canvas, true);
 
 const createScene = () => {
     const scene = new Scene(engine);
+    scene.collisionsEnabled = true;
 
     // Caméra de côté pour bien voir le mouvement
     const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 3, 10, Vector3.Zero(), scene);
