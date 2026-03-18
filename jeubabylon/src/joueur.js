@@ -66,21 +66,18 @@ export class Joueur {
         });
 
         document.addEventListener("mousemove", (e) => {
-            if (document.pointerLockElement !== this.canvas) return;
-            if (!this.root || !this.camera) return;
+    if (document.pointerLockElement !== this.canvas) return;
+    if (!this.root || !this.camera) return;
 
-            this.yaw -= e.movementX * this.mouseSensitivity;
-            this.pitch -= e.movementY * this.mouseSensitivity;
+    this.yaw += e.movementX * this.mouseSensitivity;
+    this.pitch += e.movementY * this.mouseSensitivity;
 
-            const maxPitch = Math.PI / 2 - 0.05;
-            this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
+    const maxPitch = Math.PI / 2 - 0.05;
+    this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
 
-            // gauche / droite = tourne le personnage
-            this.root.rotation.y = this.yaw;
-
-            // haut / bas = incline seulement la caméra
-            this.camera.rotation.x = this.pitch;
-        });
+    this.root.rotation.y = this.yaw;
+    this.camera.rotation.x = this.pitch;
+});
     }
 
     async _chargerModele() {
