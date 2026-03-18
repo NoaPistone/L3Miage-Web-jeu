@@ -1,4 +1,6 @@
-import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3  } from "@babylonjs/core";
+import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3, SceneLoader  } from "@babylonjs/core";
+import "@babylonjs/loaders";
+import { Joueur } from "./joueur.js";  
 
 export function addSkybox(scene) {
     // Création du cube géant
@@ -27,7 +29,7 @@ export function addSkybox(scene) {
 export function addGround(scene) {
     const ground = MeshBuilder.CreateGround(
         "ground",
-        { width: 30, height: 30 },
+        { width: 40, height: 40 },
         scene
     );
 
@@ -46,6 +48,7 @@ export function addGround(scene) {
 
 
 
+
 export function setupLightingAndFog(scene) {
     // Lumière faible
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
@@ -57,3 +60,4 @@ export function setupLightingAndFog(scene) {
     ////scene.fogDensity = 0.02;
     ////scene.fogColor = new Color3(0.02, 0.02, 0.02);
 }
+
