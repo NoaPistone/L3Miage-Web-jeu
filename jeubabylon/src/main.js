@@ -18,7 +18,7 @@ const createScene = () => {
     new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     
     // On crée l'instance du joueur
-    const monJoueur = new Joueur(scene);
+    const monJoueur = new Joueur(scene, canvas);
 
     return { scene, monJoueur };
 };
