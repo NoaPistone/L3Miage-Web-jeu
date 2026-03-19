@@ -7,8 +7,8 @@ export class GameManager {
         this.player = player;
         this.levels = [maze1, maze2, maze3];
         this.currentLevel = 0;
-        this.caseSize = 2;
-        this.height = 3;
+        this.caseSize = 4;
+        this.height = 9;
         this.mainWallMesh = null;
         this.wallMaterial = null;
         this.maze = null;
@@ -22,7 +22,14 @@ export class GameManager {
     initMaterial() {
         this.wallMaterial = new StandardMaterial("wallMat", this.scene);
         const textureUrl = new URL("./assets/textures/wall3.jpg", import.meta.url).href;
-        this.wallMaterial.diffuseTexture = new Texture(textureUrl, this.scene);
+        const wallTexture = new Texture(textureUrl, this.scene);
+        
+        // On règle la répétition ici pour que les briques ne soient pas géantes
+        // vScale gère la répétition verticale (hauteur)
+        wallTexture.vScale = 4; 
+        wallTexture.uScale = 2; // Pas de répétition horizontale, on veut des briques verticales
+        
+        this.wallMaterial.diffuseTexture = wallTexture;
         this.wallMaterial.specularColor = new Color3(0, 0, 0);
         this.wallMaterial.freeze();
     }
@@ -40,7 +47,20 @@ export class GameManager {
 
         const totalSize = maze.length * this.caseSize;
         const tempWalls = [];
-        const faceUV = new Array(6).fill(new Vector4(0, 0, 1, 1));
+
+
+        const faceUV = new Array(6);
+        
+        // Pour les côtés (0, 1, 2, 3), on garde l'orientation standard
+        faceUV[0] = new Vector4(0, 0, 1, 1);
+        faceUV[1] = new Vector4(0, 0, 1, 1);
+        faceUV[2] = new Vector4(0, 0, 1, 1);
+        faceUV[3] = new Vector4(0, 0, 1, 1);
+        
+        // Pour le haut et le bas (4, 5), on met souvent une texture neutre 
+        // ou on s'en fiche car le joueur ne les voit pas avec le toit.
+        faceUV[4] = new Vector4(0, 0, 0, 0); 
+        faceUV[5] = new Vector4(0, 0, 0, 0);
 
         for (let z = 0; z < maze.length; z++) {
             for (let x = 0; x < maze[z].length; x++) {
@@ -49,7 +69,8 @@ export class GameManager {
                         width: this.caseSize,
                         height: this.height,
                         depth: this.caseSize,
-                        faceUV: faceUV
+                        faceUV: faceUV,
+                        wrap: true
                     }, this.scene);
 
                     wall.position.x = (x * this.caseSize) - (totalSize / 2) + (this.caseSize / 2);

@@ -1,6 +1,6 @@
 import { Engine, Scene, Vector3, HemisphericLight, MeshBuilder} from "@babylonjs/core";
 import { Joueur } from "./joueur";
-import { addSkybox, addGround, setupLightingAndFog } from "./scene";
+import { addSkybox, addGround, setupLightingAndFog, addCeiling } from "./scene";
 import { GameManager } from "./gameManager";
 
 
@@ -28,6 +28,7 @@ const createScene = () => {
 const { scene, monJoueur, game } = createScene();
 addSkybox(scene);
 addGround(scene);
+addCeiling(scene, 6);
 setupLightingAndFog(scene);
 
 engine.runRenderLoop(() => {

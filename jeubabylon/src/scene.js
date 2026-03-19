@@ -26,46 +26,32 @@ export function addSkybox(scene) {
     skybox.material = skyboxMaterial;
 }
 
-export async function addGround(scene) {
-    const groundUrl = new URL("./assets/textures/ground.glb", import.meta.url).href;
+export function addGround(scene) {
+    // 1. Création du plan pour le sol (Taille 44 pour couvrir le labyrinthe de 40)
+    const ground = MeshBuilder.CreateGround("ground", { width: 90, height: 90 }, scene);
+    
+    // 2. Création du matériau
+    const groundMaterial = new StandardMaterial("groundMaterial", scene);
+    
+    // 3. Chargement de ta texture PNG
+    const groundTextureUrl = new URL("./assets/textures/ground1.jpg", import.meta.url).href;
+    const groundTexture = new Texture(groundTextureUrl, scene);
+    
+    // Optionnel : Si ton image est une petite dalle que tu veux répéter :
+    groundTexture.uScale = 20; // Répète 10 fois horizontalement
+    groundTexture.vScale = 20; // Répète 10 fois verticalement
+    
+    groundMaterial.diffuseTexture = groundTexture;
+    
+    // On retire la brillance
+    groundMaterial.specularColor = new Color3(0, 0, 0);
+    
+    ground.material = groundMaterial;
 
-    try {
-        const result = await SceneLoader.ImportMeshAsync("", "", groundUrl, scene);
-        const groundRoot = result.meshes[0];
+    // 4. Activation des collisions pour que le joueur ne tombe pas
+    ground.checkCollisions = true;
 
-        // 1. On récupère les dimensions réelles du modèle GLB
-        const boundingInfo = groundRoot.getHierarchyBoundingVectors();
-        const currentWidth = boundingInfo.max.x - boundingInfo.min.x;
-        const currentDepth = boundingInfo.max.z - boundingInfo.min.z;
-
-        // 2. On définit la taille souhaitée (Labyrinthe 40 + Marge 4 = 44)
-        const targetSize = 44; 
-
-        // 3. Calcul du ratio
-        const scaleX = currentWidth !== 0 ? targetSize / currentWidth : 1;
-        const scaleZ = currentDepth !== 0 ? targetSize / currentDepth : 1;
-
-        // 4. Application du scaling
-        groundRoot.scaling = new Vector3(scaleX, 1, scaleZ);
-
-        // Centrage parfait à l'origine
-        groundRoot.position = new Vector3(0, 0, 0);
-
-        // Configuration des collisions et du rendu
-        result.meshes.forEach(mesh => {
-            mesh.checkCollisions = true;
-            if (mesh.material) {
-                // On retire la brillance pour un aspect plus réaliste
-                mesh.material.specularColor = new Color3(0, 0, 0);
-            }
-        });
-
-        console.log(`Sol GLB redimensionné à ${targetSize}x${targetSize}`);
-        return groundRoot;
-
-    } catch (error) {
-        console.error("Erreur lors du chargement du sol GLB :", error);
-    }
+    return ground;
 }
 
 export function addGround1(scene) {
@@ -86,6 +72,37 @@ export function addGround1(scene) {
     ground.material = groundMaterial;
 
     return ground;
+}
+
+// --- TA FONCTION PLAFOND (L'image de pierre) ---
+export function addCeiling(scene, wallHeight) {
+    const ceiling = MeshBuilder.CreateGround("ceiling", { width: 100, height: 100 }, scene);
+    ceiling.position.y = wallHeight;
+    
+    // On le retourne
+    ceiling.rotation.x = Math.PI; 
+
+    const ceilingMaterial = new StandardMaterial("ceilingMat", scene);
+    
+    // 1. Correction du chemin
+    const textureUrl = new URL("./assets/textures/wall4.jpg", import.meta.url).href;
+    ceilingMaterial.diffuseTexture = new Texture(textureUrl, scene);
+    
+    // 2. Correction de la visibilité (Double face)
+    ceilingMaterial.backFaceCulling = false; 
+    
+    // 3. Correction de la luminosité (Pour ne pas qu'il soit noir)
+    ceilingMaterial.emissiveColor = new Color3(0.3, 0.3, 0.3); 
+    
+    // 4. Répétition pour que ce soit joli
+    ceilingMaterial.diffuseTexture.uScale = 20;
+    ceilingMaterial.diffuseTexture.vScale = 20;
+
+    ceilingMaterial.specularColor = new Color3(0, 0, 0);
+    ceiling.material = ceilingMaterial;
+
+    console.log("Plafond créé à la hauteur : " + wallHeight);
+    return ceiling;
 }
 
 
