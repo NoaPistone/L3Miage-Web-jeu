@@ -1,15 +1,17 @@
-import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh } from "@babylonjs/core";
-import { maze1, maze2, maze3 } from "./labyrinthe";
+import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh, SceneLoader } from "@babylonjs/core";
+import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from "./labyrinthe";
+import "@babylonjs/loaders/glTF";
 
 export class GameManager {
     constructor(scene, player) {
         this.scene = scene;
         this.player = player;
-        this.levels = [maze1, maze2, maze3];
+        this.levels = [maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9];
         this.currentLevel = 0;
         this.caseSize = 4;
         this.height = 9;
         this.mainWallMesh = null;
+        this.exitMesh = null;
         this.wallMaterial = null;
         this.maze = null;
         this.spawnPosition = null;
@@ -23,24 +25,32 @@ export class GameManager {
         this.wallMaterial = new StandardMaterial("wallMat", this.scene);
         const textureUrl = new URL("./assets/textures/wall3.jpg", import.meta.url).href;
         const wallTexture = new Texture(textureUrl, this.scene);
-        
+
         // On règle la répétition ici pour que les briques ne soient pas géantes
         // vScale gère la répétition verticale (hauteur)
-        wallTexture.vScale = 4; 
+        wallTexture.vScale = 4;
         wallTexture.uScale = 2; // Pas de répétition horizontale, on veut des briques verticales
-        
+
         this.wallMaterial.diffuseTexture = wallTexture;
         this.wallMaterial.specularColor = new Color3(0, 0, 0);
         this.wallMaterial.freeze();
     }
 
     startLevel() {
+
         if (this.mainWallMesh) {
             this.mainWallMesh.dispose();
             this.mainWallMesh = null;
         }
 
+        if (this.exitMesh) {
+            this.exitMesh.dispose();
+            this.exitMesh = null;
+        }
+
+
         const maze = this.levels[this.currentLevel];
+        console.log(`--- 🏰 NIVEAU ${this.currentLevel + 1} / ${this.levels.length} ---`);
         this.maze = maze;
         this.spawnPosition = null;
         this.playerPlaced = false;
@@ -50,20 +60,22 @@ export class GameManager {
 
 
         const faceUV = new Array(6);
-        
+
         // Pour les côtés (0, 1, 2, 3), on garde l'orientation standard
         faceUV[0] = new Vector4(0, 0, 1, 1);
         faceUV[1] = new Vector4(0, 0, 1, 1);
         faceUV[2] = new Vector4(0, 0, 1, 1);
         faceUV[3] = new Vector4(0, 0, 1, 1);
-        
+
         // Pour le haut et le bas (4, 5), on met souvent une texture neutre 
         // ou on s'en fiche car le joueur ne les voit pas avec le toit.
-        faceUV[4] = new Vector4(0, 0, 0, 0); 
+        faceUV[4] = new Vector4(0, 0, 0, 0);
         faceUV[5] = new Vector4(0, 0, 0, 0);
 
         for (let z = 0; z < maze.length; z++) {
             for (let x = 0; x < maze[z].length; x++) {
+                const posX = (x * this.caseSize) - (totalSize / 2) + (this.caseSize / 2);
+                const posZ = (z * this.caseSize) - (totalSize / 2) + (this.caseSize / 2);
                 if (maze[z][x] === 1) {
                     const wall = MeshBuilder.CreateBox("tempWall", {
                         width: this.caseSize,
@@ -72,20 +84,14 @@ export class GameManager {
                         faceUV: faceUV,
                         wrap: true
                     }, this.scene);
-
-                    wall.position.x = (x * this.caseSize) - (totalSize / 2) + (this.caseSize / 2);
-                    wall.position.z = (z * this.caseSize) - (totalSize / 2) + (this.caseSize / 2);
-                    wall.position.y = this.height / 2;
-
+                    wall.position.set(posX, this.height / 2, posZ);
                     tempWalls.push(wall);
                 }
 
+                
+
                 if (maze[z][x] === 2) {
-                    this.spawnPosition = new Vector3(
-                        (x * this.caseSize) - (totalSize / 2) + (this.caseSize / 2),
-                        0.9,
-                        (z * this.caseSize) - (totalSize / 2) + (this.caseSize / 2)
-                    );
+                    this.spawnPosition = new Vector3(posX, 0.9, posZ);
                 }
             }
         }
@@ -122,7 +128,23 @@ export class GameManager {
         const xIndex = Math.floor((this.player.collider.position.x + totalSize / 2) / this.caseSize);
         const zIndex = Math.floor((this.player.collider.position.z + totalSize / 2) / this.caseSize);
 
-        if (this.maze[zIndex] && this.maze[zIndex][xIndex] === 3) {
+
+        const isExit = (z, x) => {
+            return this.maze[z] && this.maze[z][x] === 3;
+        };
+        // On crée une petite zone de détection autour du joueur (0.6 unité de distance)
+        const detectionDist = 3;
+        const checkXPlus = Math.floor((this.player.collider.position.x + detectionDist + totalSize / 2) / this.caseSize);
+        const checkXMinus = Math.floor((this.player.collider.position.x - detectionDist + totalSize / 2) / this.caseSize);
+        const checkZPlus = Math.floor((this.player.collider.position.z + detectionDist + totalSize / 2) / this.caseSize);
+        const checkZMinus = Math.floor((this.player.collider.position.z - detectionDist + totalSize / 2) / this.caseSize);
+
+        // Si n'importe quel côté du joueur touche la case 3, on change de niveau
+        if (isExit(zIndex, xIndex) ||
+            isExit(zIndex, checkXPlus) || isExit(zIndex, checkXMinus) ||
+            isExit(checkZPlus, xIndex) || isExit(checkZMinus, xIndex)) {
+
+            console.log("🏁 Sortie atteinte !");
             this.nextLevel();
         }
     }
