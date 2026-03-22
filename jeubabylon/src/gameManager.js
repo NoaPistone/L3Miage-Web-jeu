@@ -1,5 +1,6 @@
 import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh, SceneLoader } from "@babylonjs/core";
 import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from "./labyrinthe";
+import { ItemManager } from "./itemsManager";
 import "@babylonjs/loaders/glTF";
 
 export class GameManager {
@@ -16,6 +17,7 @@ export class GameManager {
         this.maze = null;
         this.spawnPosition = null;
         this.playerPlaced = false;
+        this.itemManager = null;
 
         this.initMaterial();
         this.startLevel();
@@ -46,6 +48,11 @@ export class GameManager {
         if (this.exitMesh) {
             this.exitMesh.dispose();
             this.exitMesh = null;
+        }
+
+        if (this.itemManager) {
+            this.itemManager.dispose();
+            this.itemManager = null;
         }
 
 
@@ -102,6 +109,7 @@ export class GameManager {
             this.mainWallMesh.checkCollisions = true;
             this.mainWallMesh.freezeWorldMatrix();
         }
+        this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize);
 
         this.setPlayerPosition();
     }
@@ -121,6 +129,10 @@ export class GameManager {
         if (!this.playerPlaced) {
             this.setPlayerPosition();
             return;
+        }
+
+        if (this.itemManager) {
+            this.itemManager.update(this.player.collider.position);
         }
 
         const totalSize = this.maze.length * this.caseSize;
