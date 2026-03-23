@@ -1,6 +1,7 @@
 import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh, SceneLoader } from "@babylonjs/core";
 import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from "./labyrinthe";
 import { ItemManager } from "./itemsManager";
+import { ScoreManager } from "./scoreManager";
 import "@babylonjs/loaders/glTF";
 
 export class GameManager {
@@ -18,6 +19,7 @@ export class GameManager {
         this.spawnPosition = null;
         this.playerPlaced = false;
         this.itemManager = null;
+        this.scoreManager = new ScoreManager(this.player, this.scene);
 
         this.initMaterial();
         this.startLevel();
@@ -95,10 +97,14 @@ export class GameManager {
                     tempWalls.push(wall);
                 }
 
-                
+
 
                 if (maze[z][x] === 2) {
                     this.spawnPosition = new Vector3(posX, 0.9, posZ);
+                }
+
+                if (maze[z][x] === 3) { // 👈
+                    this.scoreManager.setExitPosition(new Vector3(posX, 0.5, posZ));
                 }
             }
         }
@@ -109,9 +115,10 @@ export class GameManager {
             this.mainWallMesh.checkCollisions = true;
             this.mainWallMesh.freezeWorldMatrix();
         }
-        this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize);
+
 
         this.setPlayerPosition();
+        this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.scoreManager);
     }
 
     setPlayerPosition() {
@@ -145,7 +152,7 @@ export class GameManager {
             return this.maze[z] && this.maze[z][x] === 3;
         };
         // On crée une petite zone de détection autour du joueur (0.6 unité de distance)
-        const detectionDist = 3;
+        const detectionDist = 1.0;
         const checkXPlus = Math.floor((this.player.collider.position.x + detectionDist + totalSize / 2) / this.caseSize);
         const checkXMinus = Math.floor((this.player.collider.position.x - detectionDist + totalSize / 2) / this.caseSize);
         const checkZPlus = Math.floor((this.player.collider.position.z + detectionDist + totalSize / 2) / this.caseSize);
@@ -162,6 +169,8 @@ export class GameManager {
     }
 
     nextLevel() {
+        this.scoreManager.supprimerFleche(); // 👈
+        this.player.desactiverBoost();
         this.currentLevel++;
 
         if (this.currentLevel >= this.levels.length) {

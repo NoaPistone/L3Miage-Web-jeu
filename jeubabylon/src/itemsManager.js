@@ -5,11 +5,12 @@ import { itemsByLevel } from "./items";
 const COLLECT_RADIUS = 3;
 
 export class ItemManager {
-    constructor(scene, level, mazeGrid, caseSize) {
+    constructor(scene, level, mazeGrid, caseSize, scoreManager) {
         this.scene = scene;
         this.items = [];
         this.caseSize = caseSize;
         this.mazeHeight = mazeGrid.length;
+        this.scoreManager = scoreManager;
         this._load(level, mazeGrid);
     }
 
@@ -33,7 +34,7 @@ export class ItemManager {
                     m.parent = pivot;
                 });
 
-                this.items.push({ meshes: meshes, root: pivot });
+                this.items.push({ meshes: meshes, root: pivot, type: item.type });
             });
         });
     }
@@ -44,19 +45,18 @@ export class ItemManager {
             if (!item.root) return false;
 
 
-            item.root.rotation.y += 0.03;
-            // Rotation sur tous les meshes enfants
-            /*item.meshes.forEach(m => {
-                m.rotation.y += 0.03;
-            });*/
+            item.root.rotation.y += 0.04;
+
 
             const dx = playerPosition.x - item.root.position.x;
             const dz = playerPosition.z - item.root.position.z;
             const dist = Math.sqrt(dx * dx + dz * dz);
 
             if (dist < COLLECT_RADIUS) {
-                item.meshes.forEach(m => m.dispose());
-                console.log("✨ Item collecté !");
+                item.root.dispose(false, true); // 👈 dispose le pivot ET tous ses enfants d'un coup
+                if (this.scoreManager) {
+                    this.scoreManager.addPoints(item.type);
+                }
                 return false;
             }
 
@@ -66,7 +66,8 @@ export class ItemManager {
     // À appeler quand on change de niveau pour nettoyer les items restants
     dispose() {
         this.items.forEach(item => {
-            if (item.mesh) item.mesh.dispose();
+            item.meshes.forEach(m => m.dispose());
+            if (item.root) item.root.dispose();
         });
         this.items = [];
     }

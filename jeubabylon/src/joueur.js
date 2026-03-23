@@ -182,4 +182,39 @@ export class Joueur {
         this.collider.moveWithCollisions(move);
     }
 }
+
+/*activerBoost(duree = 10000) {
+    if (this.boostActif) return; // évite les doublons
+    this.boostActif = true;
+    this.vitesse = 0.18; // vitesse doublée
+    console.log("⚡ Boost activé !");
+
+    setTimeout(() => {
+        this.vitesse = 0.08; // retour à la normale
+        this.boostActif = false;
+        console.log("⚡ Boost terminé !");
+    }, duree);
+}*/
+
+activerBoost(duree = 5000) {
+    if (this.boostActif) return;
+    this.boostActif = true;
+    this.vitesse = 0.18;
+    console.log("⚡ Boost activé !");
+
+    this.boostTimeout = setTimeout(() => { // 👈 stocke le timeout
+        this.desactiverBoost();
+    }, duree);
+}
+
+// 👇 nouvelle méthode publique
+desactiverBoost() {
+    this.vitesse = 0.08;
+    this.boostActif = false;
+    if (this.boostTimeout) {
+        clearTimeout(this.boostTimeout);
+        this.boostTimeout = null;
+    }
+    console.log("⚡ Boost terminé !");
+}
 }
