@@ -6,14 +6,15 @@ export class ScoreManager {
         this.player = player;
         this.scene = scene;
         this.exitPosition = null;
+        this._updateUI();
     }
 
     setExitPosition(pos) {
         this.exitPosition = pos; // 👈 appelé depuis GameManager
     }
 
-    
-    
+
+
 
     activerCarte() {
         if (!this.exitPosition || !this.player) return;
@@ -108,6 +109,13 @@ export class ScoreManager {
             default:
                 console.warn("⚠️ Type d'item inconnu :", type);
         }
+        this._updateUI();
+    }
+
+    _updateUI() {
+        console.log("_updateUI appelé, score:", this.score); // 👈
+        const el = document.getElementById("scoreValue");
+        if (el) el.textContent = this.score;
     }
 
     getScore() {

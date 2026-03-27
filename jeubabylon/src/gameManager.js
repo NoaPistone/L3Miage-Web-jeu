@@ -20,6 +20,8 @@ export class GameManager {
         this.playerPlaced = false;
         this.itemManager = null;
         this.scoreManager = new ScoreManager(this.player, this.scene);
+        this.chronoInterval = null;
+        this.chronoSecondes = 0;
 
         this.initMaterial();
         this.startLevel();
@@ -119,6 +121,7 @@ export class GameManager {
 
         this.setPlayerPosition();
         this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.scoreManager);
+        this.startChrono();
     }
 
     setPlayerPosition() {
@@ -180,5 +183,23 @@ export class GameManager {
         }
 
         this.startLevel();
+    }
+
+    startChrono() {
+        if (this.chronoInterval) clearInterval(this.chronoInterval);
+        this.chronoSecondes = 0;
+        this._updateChrono();
+
+        this.chronoInterval = setInterval(() => {
+            this.chronoSecondes++;
+            this._updateChrono();
+        }, 1000);
+    }
+
+    _updateChrono() {
+        const min = Math.floor(this.chronoSecondes / 60).toString().padStart(2, '0');
+        const sec = (this.chronoSecondes % 60).toString().padStart(2, '0');
+        const el = document.getElementById("chronoValue");
+        if (el) el.textContent = `${min}:${sec}`;
     }
 }

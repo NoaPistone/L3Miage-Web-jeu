@@ -1,12 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Test BabylonJS</title>
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
-    <canvas id="renderCanvas"></canvas>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Test BabylonJS</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="renderCanvas"></canvas>
+  <div id="hudDroit">
+    <div id="score">Score : <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="hudMilieu">
+    <img src="/src/assets/icons/temps.png" id="iconTemps" />
+    <div id="chrono"><span id="chronoValue">00:00</span></div>
+</div>
+
+  <div id="hudGauche">
+    <div id="vie">
+        <img src="/src/assets/icons/vie.png" id="iconeVie" />
+        <div id="vieBar">
+            <div id="vieBarFill"></div>
+        </div>
+    </div>
+</div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
