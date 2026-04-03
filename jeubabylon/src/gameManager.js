@@ -22,6 +22,7 @@ export class GameManager {
         this.scoreManager = new ScoreManager(this.player, this.scene);
         this.chronoInterval = null;
         this.chronoSecondes = 0;
+        this.escalierMesh = null;
 
         this.initMaterial();
         this.startLevel();
@@ -43,6 +44,10 @@ export class GameManager {
     }
 
     startLevel() {
+        if (this.escalierMesh) {
+            this.escalierMesh.dispose();
+            this.escalierMesh = null;
+        }
 
         if (this.mainWallMesh) {
             this.mainWallMesh.dispose();
@@ -107,6 +112,7 @@ export class GameManager {
 
                 if (maze[z][x] === 3) { // 👈
                     this.scoreManager.setExitPosition(new Vector3(posX, 0.5, posZ));
+                    //this._loadEscalier(posX, posZ);
                 }
             }
         }
@@ -201,5 +207,23 @@ export class GameManager {
         const sec = (this.chronoSecondes % 60).toString().padStart(2, '0');
         const el = document.getElementById("chronoValue");
         if (el) el.textContent = `${min}:${sec}`;
+    }
+
+    _loadEscalier(posX, posZ) {
+        if (this.escalierMesh) {
+            this.escalierMesh.dispose();
+            this.escalierMesh = null;
+        }
+
+        const escalierUrl = new URL("./assets/textures/escalier5.glb", import.meta.url).href;
+
+        SceneLoader.ImportMesh("", escalierUrl, "", this.scene, (meshes) => {
+            const root = meshes[0];
+            root.position.set(posX + 2, 0, posZ+0.20);
+            root.scaling.x = 0.20; // largeur inchangée
+            root.scaling.y = 0.13; // 👈 augmente seulement la hauteur
+            root.scaling.z = 0.09; // profondeur inchangée
+            this.escalierMesh = root;
+        });
     }
 }
