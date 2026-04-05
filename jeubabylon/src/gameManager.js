@@ -3,6 +3,7 @@ import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from ".
 import { ItemManager } from "./itemsManager";
 import { ScoreManager } from "./scoreManager";
 import { EnemyManager } from "./enemyManager";
+import { vieManager } from "./vieManager";
 import "@babylonjs/loaders/glTF";
 
 export class GameManager {
@@ -20,11 +21,18 @@ export class GameManager {
         this.spawnPosition = null;
         this.playerPlaced = false;
         this.itemManager = null;
-        this.scoreManager = new ScoreManager(this.player, this.scene);
+        //this.scoreManager = new ScoreManager(this.player, this.scene);
+        this.vieManager = new vieManager(100);
+        this.scoreManager = new ScoreManager(this.player, this.scene, this.vieManager);
+        this.vieManager.onMortCallback = () => {
+            this.vieManager._onMort(this.scoreManager, this);
+        };
         this.chronoInterval = null;
         this.chronoSecondes = 0;
         this.escalierMesh = null;
         this.enemyManager = null;
+        this.enTransition = false;
+
 
         this.initMaterial();
         this.startLevel();
@@ -70,7 +78,7 @@ export class GameManager {
             this.enemyManager.dispose();
             this.enemyManager = null;
         }
-        
+
 
 
         const maze = this.levels[this.currentLevel];
@@ -135,7 +143,8 @@ export class GameManager {
 
         this.setPlayerPosition();
         this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.scoreManager);
-        this.enemyManager = new EnemyManager(this.scene, this.currentLevel + 1, maze, this.caseSize, null); // 👈 ici
+        //this.enemyManager = new EnemyManager(this.scene, this.currentLevel + 1, maze, this.caseSize, null); // 👈 ici
+        this.enemyManager = new EnemyManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.vieManager);
         this.startChrono();
     }
 
@@ -150,6 +159,7 @@ export class GameManager {
     update() {
         if (!this.maze) return;
         if (!this.player || !this.player.collider) return;
+        if (this.enTransition) return;
 
         if (!this.playerPlaced) {
             this.setPlayerPosition();
@@ -190,7 +200,35 @@ export class GameManager {
         }
     }
 
+
     nextLevel() {
+        if (this.enTransition) return; // 👈 évite les appels multiples
+        this.enTransition = true;
+
+        this.scoreManager.supprimerFleche();
+        this.player.desactiverBoost();
+
+        this.currentLevel++;
+
+        if (this.currentLevel >= this.levels.length) {
+            console.log("🏆 Jeu terminé !");
+            this.currentLevel = this.levels.length - 1;
+            this.enTransition = false;
+            return;
+        }
+
+        const transition = document.getElementById("transition");
+        transition.classList.add("fadeIn");
+
+        setTimeout(() => {
+            this.startLevel();
+            setTimeout(() => {
+                transition.classList.remove("fadeIn");
+                this.enTransition = false; // 👈 réactive la détection
+            }, 300);
+        }, 800);
+    }
+    /*nextLevel() {
         this.scoreManager.supprimerFleche(); // 👈
         this.player.desactiverBoost();
         this.currentLevel++;
@@ -202,7 +240,7 @@ export class GameManager {
         }
 
         this.startLevel();
-    }
+    }*/
 
     startChrono() {
         if (this.chronoInterval) clearInterval(this.chronoInterval);
@@ -238,5 +276,12 @@ export class GameManager {
             root.scaling.z = 0.09; // profondeur inchangée
             this.escalierMesh = root;
         });
+    }
+
+    restart() {
+        this.currentLevel = 0;
+        this.vieManager.reset();
+        this.scoreManager.reset();
+        this.startLevel();
     }
 }

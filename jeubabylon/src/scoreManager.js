@@ -1,10 +1,12 @@
 import { MeshBuilder, StandardMaterial, Color3 } from "@babylonjs/core";
+import { vieManager } from "./vieManager";
 
 export class ScoreManager {
-    constructor(player, scene) {
+    constructor(player, scene, vieManager) {
         this.score = 0;
         this.player = player;
         this.scene = scene;
+        this.vieManager = vieManager;
         this.exitPosition = null;
         this._updateUI();
     }
@@ -100,10 +102,12 @@ export class ScoreManager {
                 break;
             case "bottle":
                 this.score += 5;
+                if (this.vieManager) this.vieManager.regagnerVie(20); // 👈
                 console.log("🍶 +5 points ! Score :", this.score);
                 break;
             case "apple":
                 this.score += 2;
+                if (this.vieManager) this.vieManager.regagnerVie(10); // 👈
                 console.log("🍎 +2 points ! Score :", this.score);
                 break;
             default:

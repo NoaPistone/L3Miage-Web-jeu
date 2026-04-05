@@ -123,3 +123,94 @@ html, body {
     height: 40px;
     object-fit: contain;
 }
+
+
+#gameOver {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s ease;
+}
+
+#gameOver.visible {
+    display: flex;
+}
+
+#gameOverContent {
+    background: rgba(40, 40, 40, 0.95);
+    border: 3px solid #666;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #555;
+}
+
+#gameOverTitle {
+    color: #8b0000;
+    font-family: 'MedievalSharp', serif;
+    font-size: 36px;
+    text-shadow: 2px 2px 0px #000;
+    margin-bottom: 20px;
+}
+
+#gameOverText {
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#gameOverScore {
+    color: #d4a843;
+    font-family: 'MedievalSharp', serif;
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+
+#gameOverBtn {
+    background: rgba(40, 40, 40, 0.9);
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 20px;
+    padding: 10px 30px;
+    border: 3px solid #666;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #555;
+}
+
+#gameOverBtn:hover {
+    border-color: #999;
+    color: #fff;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+}
+
+#transition.fadeOut {
+    opacity: 0;
+}
+
+#transition.fadeIn {
+    opacity: 1;
+}

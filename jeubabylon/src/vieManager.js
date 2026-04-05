@@ -1,32 +1,32 @@
 // vieManager.js
+
+
 export class vieManager {
     constructor(vieMax = 100) {
         this.vieMax = vieMax;
         this.vie = vieMax;
         this._updateUI();
     }
- 
+
     perdreVie(degats) {
         this.vie = Math.max(0, this.vie - degats);
-        console.log(`💀 -${degats} vie ! Vie restante : ${this.vie}`);
         this._updateUI();
- 
-        if (this.vie <= 0) {
-            this._onMort();
+        if (this.vie <= 0 && this.onMortCallback) {
+            this.onMortCallback();
         }
     }
- 
+
     regagnerVie(points) {
         this.vie = Math.min(this.vieMax, this.vie + points);
         console.log(`❤️ +${points} vie ! Vie restante : ${this.vie}`);
         this._updateUI();
     }
- 
+
     reset() {
         this.vie = this.vieMax;
         this._updateUI();
     }
- 
+
     _updateUI() {
         const el = document.getElementById("vieBarFill");
         if (el) {
@@ -34,12 +34,22 @@ export class vieManager {
             el.style.width = pourcentage + "%";
         }
     }
- 
-    _onMort() {
+
+    _onMort(scoreManager, gameManager) {
         console.log("💀 Le joueur est mort !");
-        // On remet la vie à fond pour l'instant
-        // Plus tard on pourra afficher un écran de game over
-        this.vie = this.vieMax;
-        this._updateUI();
+
+        const scoreEl = document.getElementById("gameOverScoreValue");
+        if (scoreEl && scoreManager) scoreEl.textContent = scoreManager.getScore();
+
+        const gameOver = document.getElementById("gameOver");
+        if (gameOver) gameOver.classList.add("visible");
+
+        const btn = document.getElementById("gameOverBtn");
+        if (btn) {
+            btn.onclick = () => {
+                gameOver.classList.remove("visible");
+                gameManager.restart();
+            };
+        }
     }
 }
