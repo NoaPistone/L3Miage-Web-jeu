@@ -2,6 +2,7 @@ import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh,
 import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from "./labyrinthe";
 import { ItemManager } from "./itemsManager";
 import { ScoreManager } from "./scoreManager";
+import { EnemyManager } from "./enemyManager";
 import "@babylonjs/loaders/glTF";
 
 export class GameManager {
@@ -23,6 +24,7 @@ export class GameManager {
         this.chronoInterval = null;
         this.chronoSecondes = 0;
         this.escalierMesh = null;
+        this.enemyManager = null;
 
         this.initMaterial();
         this.startLevel();
@@ -63,6 +65,12 @@ export class GameManager {
             this.itemManager.dispose();
             this.itemManager = null;
         }
+
+        if (this.enemyManager) {
+            this.enemyManager.dispose();
+            this.enemyManager = null;
+        }
+        
 
 
         const maze = this.levels[this.currentLevel];
@@ -127,6 +135,7 @@ export class GameManager {
 
         this.setPlayerPosition();
         this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.scoreManager);
+        this.enemyManager = new EnemyManager(this.scene, this.currentLevel + 1, maze, this.caseSize, null); // 👈 ici
         this.startChrono();
     }
 
@@ -175,6 +184,10 @@ export class GameManager {
             console.log("🏁 Sortie atteinte !");
             this.nextLevel();
         }
+
+        if (this.enemyManager) {
+            this.enemyManager.update(this.player.collider.position);
+        }
     }
 
     nextLevel() {
@@ -219,7 +232,7 @@ export class GameManager {
 
         SceneLoader.ImportMesh("", escalierUrl, "", this.scene, (meshes) => {
             const root = meshes[0];
-            root.position.set(posX + 2, 0, posZ+0.20);
+            root.position.set(posX + 2, 0, posZ + 0.20);
             root.scaling.x = 0.20; // largeur inchangée
             root.scaling.y = 0.13; // 👈 augmente seulement la hauteur
             root.scaling.z = 0.09; // profondeur inchangée
