@@ -100,9 +100,8 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+
+    width: fit-content;
 }
 
 #chrono {
@@ -116,9 +115,14 @@ html, body {
     text-shadow: 2px 2px 0px #000, -1px -1px 0px #888;
     letter-spacing: 3px;
     box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #555;
+    margin-top: 48px;
 }
 
 #iconTemps {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 40px;
     height: 40px;
     object-fit: contain;
@@ -213,4 +217,69 @@ html, body {
 
 #transition.fadeIn {
     opacity: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.menuOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+}
+
+.menuPanel {
+    min-width: 320px;
+    max-width: 520px;
+    padding: 40px 50px;
+    background: black;
+    border: 3px solid #666;
+    box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #555;
+    text-align: center;
+}
+
+.menuTitle {
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 42px;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 0px #000, -1px -1px 0px #888;
+    margin: 0 0 30px 0;
+}
+
+.menuButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.menuButton {
+    background: rgba(40, 40, 40, 0.9);
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 22px;
+    padding: 12px 24px;
+    border: 3px solid #666;
+    cursor: pointer;
+    letter-spacing: 2px;
+    box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #555;
+    transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.menuButton:hover {
+    border-color: #999;
+    color: #fff;
+    transform: scale(1.02);
+}
+
+#levelButtons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
 }

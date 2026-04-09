@@ -10,6 +10,29 @@
 
 <body>
   <canvas id="renderCanvas"></canvas>
+
+<div id="mainMenu" class="menuOverlay">
+  <div class="menuPanel">
+    <h1 class="menuTitle">Le Labyrinthe</h1>
+
+    <div class="menuButtons">
+      <button id="storyBtn" class="menuButton">Mode histoire</button>
+      <button id="levelBtn" class="menuButton">Choix du niveau</button>
+      <button id="quitBtn" class="menuButton">Quitter</button>
+    </div>
+  </div>
+</div>
+
+<div id="levelMenu" class="menuOverlay hidden">
+  <div class="menuPanel">
+    <h1 class="menuTitle">Choisir un niveau</h1>
+
+    <div id="levelButtons"></div>
+
+    <button id="backBtn" class="menuButton">Retour</button>
+  </div>
+</div>
+
   <div id="hudDroit">
     <div id="score">Score : <span id="scoreValue">0</span></div>
   </div>
