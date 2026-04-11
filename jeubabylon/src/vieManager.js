@@ -37,6 +37,9 @@ export class vieManager {
 
     _onMort(scoreManager, gameManager) {
         console.log("💀 Le joueur est mort !");
+        if (document.exitPointerLock) {
+            document.exitPointerLock();
+        }
 
         const scoreEl = document.getElementById("gameOverScoreValue");
         if (scoreEl && scoreManager) scoreEl.textContent = scoreManager.getScore();
@@ -48,7 +51,12 @@ export class vieManager {
         if (btn) {
             btn.onclick = () => {
                 gameOver.classList.remove("visible");
-                gameManager.restart();
+                gameManager.isRunning = false;
+                
+                document.getElementById("mainMenu")?.classList.remove("hidden");
+                document.getElementById("hudDroit").style.display = "none";
+                document.getElementById("hudGauche").style.display = "none";
+                document.getElementById("hudMilieu").style.display = "none";
             };
         }
     }

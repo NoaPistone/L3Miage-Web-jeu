@@ -21,6 +21,14 @@ const hudDroit = document.getElementById("hudDroit");
 const hudGauche = document.getElementById("hudGauche");
 const hudMilieu = document.getElementById("hudMilieu");
 
+// Nouvelles variables
+const introScreen = document.getElementById("introScreen");
+const introBtn = document.getElementById("introBtn");
+const introText = document.getElementById("introText");
+const levelIntro = document.getElementById("levelIntro");
+const levelIntroBtn = document.getElementById("levelIntroBtn");
+const levelIntroText = document.getElementById("levelIntroText");
+
 let gameStarted = false;
 
 const createScene = () => {
@@ -64,12 +72,48 @@ function hideMenus() {
     levelMenu.classList.add("hidden");
 }
 
-function startStory() {
+/*function startStory() {
     hideMenus();
     showHud(true);
     game.startStoryMode();
     gameStarted = true;
+}*/
+
+function showLevelIntro(levelIndex, callback) {
+    const text = game.getLevelIntroText(levelIndex);
+    console.log("Phrase niveau", levelIndex, ":", text); // pour débugger
+    if (!text) { callback(); return; }
+    if (document.exitPointerLock) {
+        document.exitPointerLock();
+    }
+    levelIntroText.textContent = text;
+    levelIntro.classList.remove("hidden");
+    levelIntroBtn.onclick = () => {
+        levelIntro.classList.add("hidden");
+        canvas.requestPointerLock();
+        callback();
+    };
 }
+window.showLevelIntro = showLevelIntro;
+
+function startStory() {
+    hideMenus();
+    introText.textContent = game.getIntroText();
+    introScreen.classList.remove("hidden");
+}
+
+
+
+// Ajouter le listener du bouton intro
+introBtn.addEventListener("click", () => {
+    introScreen.classList.add("hidden");
+    showHud(true);
+    gameStarted = true;
+    showLevelIntro(0, () => {
+        canvas.requestPointerLock();
+        game.startStoryMode();
+    });
+});
 
 function startSelectedLevel(levelIndex) {
     hideMenus();

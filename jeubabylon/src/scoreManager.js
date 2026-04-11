@@ -128,5 +128,6 @@ export class ScoreManager {
 
     reset() {
         this.score = 0;
+        this._updateUI();
     }
 }

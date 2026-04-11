@@ -5,6 +5,9 @@ import { ScoreManager } from "./scoreManager";
 import { EnemyManager } from "./enemyManager";
 import { vieManager } from "./vieManager";
 import "@babylonjs/loaders/glTF";
+import { INTRO_TEXT, LEVEL_INTROS } from "./story";
+
+
 
 export class GameManager {
     constructor(scene, player, autoStart = false) {
@@ -212,6 +215,44 @@ export class GameManager {
         transition.classList.add("fadeIn");
 
         setTimeout(() => {
+            if (window.showLevelIntro) {
+                window.showLevelIntro(this.currentLevel, () => {
+                    this.startLevel();
+                    setTimeout(() => {
+                        transition.classList.remove("fadeIn");
+                        this.enTransition = false;
+                    }, 300);
+                });
+            } else {
+                this.startLevel();
+                setTimeout(() => {
+                    transition.classList.remove("fadeIn");
+                    this.enTransition = false;
+                }, 300);
+            }
+        }, 800);
+    }
+
+    /*nextLevel() {
+        if (this.enTransition) return;
+        this.enTransition = true;
+
+        this.scoreManager.supprimerFleche();
+        this.player.desactiverBoost();
+
+        this.currentLevel++;
+
+        if (this.currentLevel >= this.levels.length) {
+            console.log("🏆 Jeu terminé !");
+            this.currentLevel = this.levels.length - 1;
+            this.enTransition = false;
+            return;
+        }
+
+        const transition = document.getElementById("transition");
+        transition.classList.add("fadeIn");
+
+        setTimeout(() => {
             this.startLevel();
 
             setTimeout(() => {
@@ -219,7 +260,7 @@ export class GameManager {
                 this.enTransition = false;
             }, 300);
         }, 800);
-    }
+    }*/
 
     startChrono() {
         if (this.chronoInterval) clearInterval(this.chronoInterval);
@@ -240,65 +281,65 @@ export class GameManager {
     }
 
     _loadEscalier(posX, posZ) {
-    if (this.escalierMesh) {
-        this.escalierMesh.dispose();
-        this.escalierMesh = null;
-    }
+        if (this.escalierMesh) {
+            this.escalierMesh.dispose();
+            this.escalierMesh = null;
+        }
 
-    const escalierUrl = new URL("./assets/textures/escalier5.glb", import.meta.url).href;
+        const escalierUrl = new URL("./assets/textures/escalier5.glb", import.meta.url).href;
 
-    SceneLoader.ImportMesh(
-        "",
-        "",
-        escalierUrl,
-        this.scene,
-        (meshes) => {
-            if (!meshes || meshes.length === 0) {
-                console.log("Aucun mesh chargé pour l'escalier.");
-                return;
-            }
-
-            const root = new Mesh("escalierRoot", this.scene);
-
-            meshes.forEach((mesh) => {
-                if (mesh !== root) {
-                    mesh.parent = root;
-                    mesh.checkCollisions = false;
+        SceneLoader.ImportMesh(
+            "",
+            "",
+            escalierUrl,
+            this.scene,
+            (meshes) => {
+                if (!meshes || meshes.length === 0) {
+                    console.log("Aucun mesh chargé pour l'escalier.");
+                    return;
                 }
-            });
 
-            root.scaling = new Vector3(0.20, 0.13, 0.09);
+                const root = new Mesh("escalierRoot", this.scene);
 
-            // Force Babylon à recalculer les matrices
-            this.scene.executeWhenReady(() => {
-                const bounds = root.getHierarchyBoundingVectors();
-
-                const centerX = (bounds.min.x + bounds.max.x) / 2;
-                const centerZ = (bounds.min.z + bounds.max.z) / 2;
-                const bottomY = bounds.min.y;
-
-                // On recentre les enfants autour de root
-                root.getChildMeshes().forEach((child) => {
-                    child.position.x -= centerX;
-                    child.position.y -= bottomY;
-                    child.position.z -= centerZ;
+                meshes.forEach((mesh) => {
+                    if (mesh !== root) {
+                        mesh.parent = root;
+                        mesh.checkCollisions = false;
+                    }
                 });
 
-                // Puis on place root exactement sur la sortie
-                root.position = new Vector3(posX, 0, posZ);
+                root.scaling = new Vector3(0.20, 0.13, 0.09);
 
-                // Si l’escalier regarde dans le mauvais sens, décommente :
-                // root.rotation.y = Math.PI;
+                // Force Babylon à recalculer les matrices
+                this.scene.executeWhenReady(() => {
+                    const bounds = root.getHierarchyBoundingVectors();
 
-                this.escalierMesh = root;
-            });
-        },
-        null,
-        (scene, message, exception) => {
-            console.error("Erreur chargement escalier :", message, exception);
-        }
-    );
-}
+                    const centerX = (bounds.min.x + bounds.max.x) / 2;
+                    const centerZ = (bounds.min.z + bounds.max.z) / 2;
+                    const bottomY = bounds.min.y;
+
+                    // On recentre les enfants autour de root
+                    root.getChildMeshes().forEach((child) => {
+                        child.position.x -= centerX;
+                        child.position.y -= bottomY;
+                        child.position.z -= centerZ;
+                    });
+
+                    // Puis on place root exactement sur la sortie
+                    root.position = new Vector3(posX, 0, posZ);
+
+                    // Si l’escalier regarde dans le mauvais sens, décommente :
+                    // root.rotation.y = Math.PI;
+
+                    this.escalierMesh = root;
+                });
+            },
+            null,
+            (scene, message, exception) => {
+                console.error("Erreur chargement escalier :", message, exception);
+            }
+        );
+    }
 
     restart() {
         this.currentLevel = 0;
@@ -328,5 +369,13 @@ export class GameManager {
         this.vieManager.reset();
         this.scoreManager.reset();
         this.startLevel();
+    }
+
+    getIntroText() {
+        return INTRO_TEXT;
+    }
+
+    getLevelIntroText(levelIndex) {
+        return LEVEL_INTROS[levelIndex] ?? null;
     }
 }
