@@ -299,9 +299,126 @@ html, body {
     overflow: visible;
     word-wrap: break-word;
 }
+
 #introScreen .menuPanel,
 #levelIntro .menuPanel {
     min-width: 400px;
     max-width: 620px;
     overflow: visible;
+}
+
+.infoBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(40, 40, 40, 0.9);
+    border: 2px solid #666;
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 3px #000;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.infoBtn:hover {
+    border-color: #999;
+    color: #fff;
+}
+
+.aideSection {
+    color: #888;
+    font-family: 'MedievalSharp', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 6px;
+    text-align: left;
+}
+
+.aideRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.aideKey {
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 13px;
+    background: rgba(40, 40, 40, 0.9);
+    border: 1px solid #555;
+    padding: 2px 8px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.aideIcon {
+    font-size: 20px;
+    width: 28px;
+    text-align: center;
+}
+
+.aideDesc {
+    color: #888;
+    font-family: 'MedievalSharp', serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.aideSep {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 16px 0;
+}
+
+.infoBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(40, 40, 40, 0.9);
+    border: 2px solid #666;
+    color: #c8c8c8;
+    font-family: 'MedievalSharp', serif;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 3px #000;
+    transition: border-color 0.15s, color 0.15s;
+    z-index: 1; /* 👈 important */
+    pointer-events: auto; /* 👈 important */
+}
+
+.menuPanel {
+    position: relative;
+    z-index: 0;
+}
+
+
+.finStat {
+    color: #d4a843;
+    font-family: 'MedievalSharp', serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 0px #000;
+}
+
+.finBoutons {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.finBoutons .menuButton {
+    flex: 1;
 }

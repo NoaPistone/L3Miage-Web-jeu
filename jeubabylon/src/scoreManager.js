@@ -12,7 +12,7 @@ export class ScoreManager {
     }
 
     setExitPosition(pos) {
-        this.exitPosition = pos; // 👈 appelé depuis GameManager
+        this.exitPosition = pos; 
     }
 
 
@@ -54,7 +54,7 @@ export class ScoreManager {
 
         this.scene.onBeforeRenderObservable.add(updateArrow);
 
-        // 👇 on stocke pour pouvoir supprimer depuis l'extérieur
+        
         this.flecheActive = fleche;
         this.flecheObserver = updateArrow;
 
@@ -63,7 +63,7 @@ export class ScoreManager {
         }, 15000);
     }
 
-    // 👇 nouvelle méthode publique
+    
     supprimerFleche() {
         if (this.flecheObserver) {
             this.scene.onBeforeRenderObservable.removeCallback(this.flecheObserver);
@@ -81,7 +81,7 @@ export class ScoreManager {
 
 
     addPoints(type) {
-        console.log("addPoints appelé avec type:", type); // 👈
+        console.log("addPoints appelé avec type:", type);
         switch (type) {
             case "cristal":
                 this.score += 50;
@@ -93,7 +93,7 @@ export class ScoreManager {
                 break;
             case "carte":
                 this.score += 15;
-                this.activerCarte(); // 👈
+                this.activerCarte(); 
                 console.log("🗺️ +15 points ! Score :", this.score);
                 break;
             case "boost":
@@ -102,12 +102,12 @@ export class ScoreManager {
                 break;
             case "bottle":
                 this.score += 5;
-                if (this.vieManager) this.vieManager.regagnerVie(20); // 👈
+                if (this.vieManager) this.vieManager.regagnerVie(20); 
                 console.log("🍶 +5 points ! Score :", this.score);
                 break;
             case "apple":
                 this.score += 2;
-                if (this.vieManager) this.vieManager.regagnerVie(10); // 👈
+                if (this.vieManager) this.vieManager.regagnerVie(10); 
                 console.log("🍎 +2 points ! Score :", this.score);
                 break;
             default:
@@ -117,7 +117,7 @@ export class ScoreManager {
     }
 
     _updateUI() {
-        console.log("_updateUI appelé, score:", this.score); // 👈
+        console.log("_updateUI appelé, score:", this.score);
         const el = document.getElementById("scoreValue");
         if (el) el.textContent = this.score;
     }

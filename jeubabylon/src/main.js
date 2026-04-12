@@ -21,13 +21,19 @@ const hudDroit = document.getElementById("hudDroit");
 const hudGauche = document.getElementById("hudGauche");
 const hudMilieu = document.getElementById("hudMilieu");
 
-// Nouvelles variables
+
 const introScreen = document.getElementById("introScreen");
 const introBtn = document.getElementById("introBtn");
 const introText = document.getElementById("introText");
 const levelIntro = document.getElementById("levelIntro");
 const levelIntroBtn = document.getElementById("levelIntroBtn");
 const levelIntroText = document.getElementById("levelIntroText");
+
+const aideBtn = document.getElementById("aideBtn");
+const aide = document.getElementById("aide");
+const aideRetourBtn = document.getElementById("aideRetourBtn");
+
+
 
 let gameStarted = false;
 
@@ -72,16 +78,9 @@ function hideMenus() {
     levelMenu.classList.add("hidden");
 }
 
-/*function startStory() {
-    hideMenus();
-    showHud(true);
-    game.startStoryMode();
-    gameStarted = true;
-}*/
-
 function showLevelIntro(levelIndex, callback) {
     const text = game.getLevelIntroText(levelIndex);
-    console.log("Phrase niveau", levelIndex, ":", text); // pour débugger
+    console.log("Phrase niveau", levelIndex, ":", text); 
     if (!text) { callback(); return; }
     if (document.exitPointerLock) {
         document.exitPointerLock();
@@ -104,7 +103,7 @@ function startStory() {
 
 
 
-// Ajouter le listener du bouton intro
+
 introBtn.addEventListener("click", () => {
     introScreen.classList.add("hidden");
     showHud(true);
@@ -166,4 +165,14 @@ engine.runRenderLoop(() => {
 
 window.addEventListener("resize", () => {
     engine.resize();
+});
+
+aideBtn.addEventListener("click", () => {
+    mainMenu.classList.add("hidden");
+    aide.classList.remove("hidden");
+});
+
+aideRetourBtn.addEventListener("click", () => {
+    aide.classList.add("hidden");
+    mainMenu.classList.remove("hidden");
 });

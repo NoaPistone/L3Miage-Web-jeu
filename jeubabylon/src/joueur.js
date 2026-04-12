@@ -17,8 +17,8 @@ export class Joueur {
         this.mouseSensitivity = 0.0025;
 
         this.inputMap = {};
-        this.root = null;        // modèle visuel
-        this.collider = null;    // collisions + déplacement
+        this.root = null;        
+        this.collider = null;    
         this.skeleton = null;
         this.camera = null;
 
@@ -26,7 +26,7 @@ export class Joueur {
         this.pitch = 0;
         this.isLoaded = false;
 
-        // Collider invisible
+        
         this.collider = MeshBuilder.CreateBox(
             "playerCollider",
             { width: 0.8, depth: 0.8, height: 1.8 },
@@ -107,13 +107,13 @@ export class Joueur {
         console.log("=== MODELE CHARGE ===");
         console.log("Meshes :", result.meshes.map(m => m.name));
 
-        const importedRoot = result.meshes[0];   // __root__
-        const bodyMesh = result.meshes[1];       // Ch24
+        const importedRoot = result.meshes[0];   
+        const bodyMesh = result.meshes[1];      
 
         this.root = importedRoot;
         this.bodyMesh = bodyMesh;
 
-        // On garde toute la hiérarchie importée
+        
         this.root.parent = this.collider;
         this.root.scaling = new Vector3(1, 1, 1);
         this.root.position = new Vector3(0, -0.9, 0);
@@ -124,7 +124,7 @@ export class Joueur {
             this.skeleton = result.skeletons[0];
         }
 
-        // DEBUG VISUEL
+        
         this.bodyMesh.isVisible = true;
         this.bodyMesh.setEnabled(true);
         this.bodyMesh.showBoundingBox = false;
@@ -183,31 +183,19 @@ export class Joueur {
     }
 }
 
-/*activerBoost(duree = 10000) {
-    if (this.boostActif) return; // évite les doublons
-    this.boostActif = true;
-    this.vitesse = 0.18; // vitesse doublée
-    console.log("⚡ Boost activé !");
 
-    setTimeout(() => {
-        this.vitesse = 0.08; // retour à la normale
-        this.boostActif = false;
-        console.log("⚡ Boost terminé !");
-    }, duree);
-}*/
-
-activerBoost(duree = 5000) {
+activerBoost(duree = 10000) {
     if (this.boostActif) return;
     this.boostActif = true;
     this.vitesse = 0.18;
     console.log("⚡ Boost activé !");
 
-    this.boostTimeout = setTimeout(() => { // 👈 stocke le timeout
+    this.boostTimeout = setTimeout(() => { 
         this.desactiverBoost();
     }, duree);
 }
 
-// 👇 nouvelle méthode publique
+
 desactiverBoost() {
     this.vitesse = 0.08;
     this.boostActif = false;

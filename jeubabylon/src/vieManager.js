@@ -1,6 +1,3 @@
-// vieManager.js
-
-
 export class vieManager {
     constructor(vieMax = 100) {
         this.vieMax = vieMax;

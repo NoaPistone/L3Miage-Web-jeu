@@ -1,5 +1,5 @@
 import { MeshBuilder, StandardMaterial, Texture, Color3, Vector3, Vector4, Mesh, SceneLoader } from "@babylonjs/core";
-import { maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9 } from "./labyrinthe";
+import { maze1, maze2, maze3, maze4, maze5, maze6, maze7 } from "./labyrinthe";
 import { ItemManager } from "./itemsManager";
 import { ScoreManager } from "./scoreManager";
 import { EnemyManager } from "./enemyManager";
@@ -13,7 +13,7 @@ export class GameManager {
     constructor(scene, player, autoStart = false) {
         this.scene = scene;
         this.player = player;
-        this.levels = [maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9];
+        this.levels = [maze1, maze2, maze3, maze4, maze5, maze6, maze7];
         this.currentLevel = 0;
         this.caseSize = 4;
         this.height = 9;
@@ -35,6 +35,7 @@ export class GameManager {
         this.enemyManager = null;
         this.enTransition = false;
         this.isRunning = false;
+        this.chronoTotal = 0;
 
         this.initMaterial();
 
@@ -138,7 +139,9 @@ export class GameManager {
         this.setPlayerPosition();
         this.itemManager = new ItemManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.scoreManager);
         this.enemyManager = new EnemyManager(this.scene, this.currentLevel + 1, maze, this.caseSize, this.vieManager);
+        this.chronoTotal += this.chronoSecondes;
         this.startChrono();
+
     }
 
     setPlayerPosition() {
@@ -206,8 +209,40 @@ export class GameManager {
 
         if (this.currentLevel >= this.levels.length) {
             console.log("🏆 Jeu terminé !");
-            this.currentLevel = this.levels.length - 1;
+            this.isRunning = false;
             this.enTransition = false;
+
+            if (this.chronoInterval) clearInterval(this.chronoInterval);
+
+            const transition = document.getElementById("transition");
+            transition.classList.add("fadeIn");
+
+            if (document.exitPointerLock) document.exitPointerLock();
+
+            setTimeout(() => {
+                transition.classList.remove("fadeIn");
+                const totalSecondes = this.chronoTotal + this.chronoSecondes;
+                const min = Math.floor(totalSecondes / 60).toString().padStart(2, "0");
+                const sec = (totalSecondes % 60).toString().padStart(2, "0");
+
+                document.getElementById("finScoreValue").textContent = this.scoreManager.getScore();
+                document.getElementById("finTempsValue").textContent = `${min}:${sec}`;
+                document.getElementById("finJeu").classList.remove("hidden");
+
+                document.getElementById("finQuitterBtn").onclick = () => {
+                    window.close();
+                };
+
+                // Bouton menu principal
+                document.getElementById("finMenuBtn").onclick = () => {
+                    document.getElementById("finJeu").classList.add("hidden");
+                    document.getElementById("hudDroit").style.display = "none";
+                    document.getElementById("hudGauche").style.display = "none";
+                    document.getElementById("hudMilieu").style.display = "none";
+                    document.getElementById("mainMenu").classList.remove("hidden");
+                };
+            }, 800);
+
             return;
         }
 
@@ -231,6 +266,7 @@ export class GameManager {
                 }, 300);
             }
         }, 800);
+
     }
 
     /*nextLevel() {
