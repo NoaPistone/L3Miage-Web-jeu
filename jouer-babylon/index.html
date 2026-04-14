@@ -1,15 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Test BabylonJS</title>
-    <style>
-      body { margin: 0; overflow: hidden; width: 100%; height: 100vh; }
-      canvas { width: 100%; height: 100%; display: block; outline: none; }
-    </style>
-    <script type="module" crossorigin src="./assets/index-C2ydti0F.js"></script>
-  </head>
-  <body>
-    <canvas id="renderCanvas"></canvas>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Test BabylonJS</title>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../src/assets/logo.png">
+  <script type="module" crossorigin src="./assets/index-Dn78SUFL.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D0TMqY4c.css">
+</head>
+
+<body>
+  <canvas id="renderCanvas"></canvas>
+
+<div id="mainMenu" class="menuOverlay">
+  <div class="menuPanel" style="position:relative">
+    <button id="aideBtn" class="infoBtn">i</button>
+    <h1 class="menuTitle">Le Labyrinthe</h1>
+
+    <div class="menuButtons">
+      <button id="storyBtn" class="menuButton">Mode histoire</button>
+      <button id="levelBtn" class="menuButton">Choix du niveau</button>
+      <button id="quitBtn" class="menuButton">Quitter</button>
+    </div>
+  </div>
+</div>
+
+<div id="levelMenu" class="menuOverlay hidden">
+  <div class="menuPanel">
+    <h1 class="menuTitle">Choisir un niveau</h1>
+
+    <div id="levelButtons"></div>
+
+    <button id="backBtn" class="menuButton">Retour</button>
+  </div>
+</div>
+
+  <div id="hudDroit">
+    <div id="score">Score : <span id="scoreValue">0</span></div>
+  </div>
+
+  <div id="hudMilieu">
+    <img src="./assets/temps-Cj-Iz-pe.png" id="iconTemps" />
+    <div id="chrono"><span id="chronoValue">00:00</span></div>
+</div>
+
+  <div id="hudGauche">
+    <div id="vie">
+        <img src="./assets/vie-BkoKVqFv.png" id="iconeVie" />
+        <div id="vieBar">
+            <div id="vieBarFill"></div>
+        </div>
+    </div>
+</div>
+<div id="gameOver">
+    <div id="gameOverContent">
+        <h1 id="gameOverTitle"> PARTIE TERMINÉE </h1>
+        <p id="gameOverText">Vous n'avez plus de vie...</p>
+        <p id="gameOverScore">Score final : <span id="gameOverScoreValue">0</span></p>
+        <button id="gameOverBtn">Recommencer</button>
+    </div>
+</div>
+<div id="transition"></div>
+<div id="finJeu" class="menuOverlay hidden">
+  <div class="menuPanel" style="max-width:520px">
+    <h1 class="menuTitle">Liberté</h1>
+    <p class="introText" style="margin-bottom:16px">L’air change, le silence disparaît…<br>Tu es sorti du labyrinthe, cette fois pour de vrai.</p>
+    <p class="finStat">Score final : <span id="finScoreValue">0</span></p>
+    <p class="finStat">Temps total : <span id="finTempsValue">00:00</span></p>
+    <div class="finBoutons">
+      <button id="finMenuBtn" class="menuButton">Menu principal</button>
+      <button id="finQuitterBtn" class="menuButton">Quitter</button>
+    </div>
+  </div>
+</div>
+<div id="introScreen" class="menuOverlay hidden">
+  <div class="menuPanel" style="max-width:620px">
+    <h1 class="menuTitle">Le Labyrinthe</h1>
+    <div id="introText" class="introText"></div>
+    <button id="introBtn" class="menuButton">Commencer</button>
+  </div>
+</div>
+
+<div id="levelIntro" class="menuOverlay hidden">
+  <div class="menuPanel" style="max-width:520px">
+    <p id="levelIntroText" class="introText"></p>
+    <button id="levelIntroBtn" class="menuButton">Entrer</button>
+  </div>
+</div>
+
+<div id="aide" class="menuOverlay hidden">
+  <div class="menuPanel" style="position:relative">
+    <h1 class="menuTitle">Aide</h1>
+
+    <p class="aideSection">Contrôles</p>
+    <div class="aideRow"><span class="aideKey">ZQSD</span><span class="aideDesc">Se déplacer</span></div>
+    <div class="aideRow"><span class="aideKey">Souris</span><span class="aideDesc">Regarder autour</span></div>
+    <div class="aideRow"><span class="aideKey">Échap</span><span class="aideDesc">Libérer la souris</span></div>
+
+    <hr class="aideSep">
+
+    <p class="aideSection">Objets</p>
+    <div class="aideRow"><span class="aideIcon">🪙</span><span class="aideDesc">Pièce — +10 pts</span></div>
+    <div class="aideRow"><span class="aideIcon">💎</span><span class="aideDesc">Cristal — +50 pts</span></div>
+    <div class="aideRow"><span class="aideIcon">⚡</span><span class="aideDesc">Boost — vitesse x2 pendant 10s</span></div>
+    <div class="aideRow"><span class="aideIcon">🗺️</span><span class="aideDesc">Carte — +15 pts, flèche vers la sortie 15s</span></div>
+    <div class="aideRow"><span class="aideIcon">🍎</span><span class="aideDesc">Pomme — +2 pts, +10 pts de vie</span></div>
+    <div class="aideRow"><span class="aideIcon">🍶</span><span class="aideDesc">Bouteille — +5 pts, +20 pts de vie</span></div>
+
+    <button id="aideRetourBtn" class="menuButton" style="margin-top:24px">Retour</button>
+  </div>
+</div>
+</body>
+
 </html>
