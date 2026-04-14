@@ -6,13 +6,25 @@ export default class GameOver {
     this.ctx = ctx;
     this.jeux = jeux;
 
-
     let x = (canvas.width - 260) / 2;
     let y = 260;
     this.btnRejouer = new Bouton(x, y, 260, 70, "Rejouer", () => {
       this.jeux.init();
       this.jeux.demarrerTimer();
       this.jeux.etat = "JEU EN COURS";
+    });
+  }
+
+  envoyerScore() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    fetch('/api/scores', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ jeu: 'jeu1', score: this.jeux.score })
     });
   }
 

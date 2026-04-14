@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Mes Scores</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<section style="max-width:860px;margin:2rem auto;padding:0 1rem">
+  <h2>🏆 Mes meilleurs scores</h2>
+  <div id="scores-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:1.5rem">
+    <p>Chargement...</p>
+  </div>
+</section>
+</main>
+<script>
+const NOMS = { jeu1: 'Jeu Canvas 2D', jeu2: 'Jeu Babylon.js', jeu3: 'Jeu 3' };
+
+async function loadScores() {
+  const token = localStorage.getItem('token');
+  const pseudo = localStorage.getItem('pseudo');
+  const container = document.getElementById('scores-container');
+
+  if (!token) {
+    container.innerHTML = '<p style="color:white;text-align:center">Connectez-vous pour voir vos scores.</p>';
+    return;
+  }
+
+  const res = await fetch('/api/scores', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('pseudo');
+    container.innerHTML = '<p style="color:white;text-align:center">Connectez-vous pour voir vos scores.</p>';
+    return;
+  }
+
+  const data = await res.json();
+  container.innerHTML = '';
+
+  for (const [jeu, scores] of Object.entries(data)) {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#1a1a2e;border-radius:12px;padding:1.2rem;color:white';
+
+    const score = scores[0];
+
+    card.innerHTML = `
+      <h3 style="margin:0 0 .8rem">${NOMS[jeu] || jeu}</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">
+        <span style="opacity:.7">👤 ${pseudo}</span>
+        <span style="font-size:1.4rem;font-weight:700;color:#f0c040">
+          ${score ? score.score + ' pts' : '—'}
+        </span>
+      </div>
+      <div style="margin-top:.5rem;opacity:.4;font-size:.8rem">
+        ${score ? 'Dernière mise à jour : ' + new Date(score.date).toLocaleDateString('fr-FR') : 'Aucun score enregistré'}
+      </div>`;
+
+    container.appendChild(card);
+  }
+}
+
+loadScores();
+</script>
+</body>
+</html>

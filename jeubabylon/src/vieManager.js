@@ -34,6 +34,8 @@ export class vieManager {
 
     _onMort(scoreManager, gameManager) {
         console.log("💀 Le joueur est mort !");
+
+
         if (document.exitPointerLock) {
             document.exitPointerLock();
         }
@@ -49,7 +51,7 @@ export class vieManager {
             btn.onclick = () => {
                 gameOver.classList.remove("visible");
                 gameManager.isRunning = false;
-                
+
                 document.getElementById("mainMenu")?.classList.remove("hidden");
                 document.getElementById("hudDroit").style.display = "none";
                 document.getElementById("hudGauche").style.display = "none";
