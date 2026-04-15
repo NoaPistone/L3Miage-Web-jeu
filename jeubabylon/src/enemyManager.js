@@ -28,7 +28,7 @@ export class EnemyManager {
         const configs = enemiesByLevel[level] || [];
         configs.forEach(config => {
             if (maze[config.row] && maze[config.row][config.col] !== 1) {
-                this.enemies.push(new Enemy(this.scene, maze, caseSize, config.row, config.col, "monstre3.glb"));
+                this.enemies.push(new Enemy(this.scene, maze, caseSize, config.row, config.col, "monstre4.glb"));
             }
         });
     }   
