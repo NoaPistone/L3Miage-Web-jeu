@@ -1,13 +1,17 @@
-import { SceneLoader, Vector3, TransformNode, Quaternion } from "@babylonjs/core";
+import {
+    SceneLoader,
+    Vector3,
+    TransformNode,
+    Quaternion,
+    MeshBuilder
+} from "@babylonjs/core";
 import { aStar } from "./Astar";
 
-/**
- * CONFIGURATION DU COMPORTEMENT
- */
-const VITESSE = 0.04;        
-const RECALCUL_INTERVAL = 60; 
-const CONTACT_RADIUS = 1.2; 
-const VITESSE_ROTATION = 0.12; // Plus c'est bas, plus le virage est large (naturel)
+const VITESSE = 0.05;
+const RECALCUL_INTERVAL = 20;
+const VITESSE_ROTATION = 0.18;
+const DIRECT_CHASE_DISTANCE = 3.0; // Portée de détection directe augmentée
+const STOP_DISTANCE = 0.1; // Distance d'arrêt quasi nulle pour coller au joueur
 
 export class Enemy {
     constructor(scene, maze, caseSize, startRow, startCol, fileName) {
@@ -16,10 +20,31 @@ export class Enemy {
         this.caseSize = caseSize;
         this.chemin = [];
         this.frameCount = 0;
+        this.collisionRadius = 0.35; // Rayon logique réduit
+
+        this.lastPosition = new Vector3(0, 0, 0);
+        this.stuckCounter = 0;
+        this.stuckMode = 0;
+
+        // Collider plus petit pour se faufiler partout
+        this.collider = MeshBuilder.CreateBox(
+            "enemyCollider",
+            { width: 0.5, depth: 0.5, height: 1.8 }, 
+            this.scene
+        );
+        this.collider.isVisible = false;
+        this.collider.checkCollisions = true;
         
-        // Le Root est le "cerveau" qui se déplace
+        // CRUCIAL : Ellipsoïde très fin (0.2) pour éviter de rester bloqué loin des murs
+        this.collider.ellipsoid = new Vector3(0.2, 0.9, 0.2);
+        this.collider.ellipsoidOffset = new Vector3(0, 0.9, 0);
+
         this.root = new TransformNode("enemy_root", this.scene);
-        this.mesh = null; 
+        this.root.parent = this.collider;
+        this.root.position = new Vector3(0, -0.8, 0);
+        this.root.rotationQuaternion = Quaternion.Identity();
+
+        this.mesh = null;
         this.anims = {};
         this.isLoaded = false;
         this.currentAnimName = "";
@@ -30,129 +55,119 @@ export class Enemy {
     async _chargerModele(fileName, row, col) {
         try {
             const result = await SceneLoader.ImportMeshAsync("", "/assets/monstre/", fileName, this.scene);
-            
-            // On prend le premier mesh et on l'attache au root
             this.mesh = result.meshes[0];
             this.mesh.parent = this.root;
-            
-            /**
-             * CORRECTION DE L'ORIENTATION
-             * On tourne le mesh de 180° localement car le modèle 3D regarde vers l'arrière par défaut.
-             */
-            this.mesh.rotationQuaternion = null; // On force l'usage de .rotation pour l'offset
-            this.mesh.rotation.y = Math.PI; 
+            this.mesh.rotation.y = Math.PI;
 
-            // Initialisation de la position sur la grille
             const totalSize = this.maze.length * this.caseSize;
-            this.root.position.set(
+            this.collider.position.set(
                 (col * this.caseSize) - (totalSize / 2) + (this.caseSize / 2),
-                0.1, 
+                0.9,
                 (row * this.caseSize) - (totalSize / 2) + (this.caseSize / 2)
             );
 
-            // Initialisation du Quaternion sur le root (nécessaire pour le Slerp)
-            this.root.rotationQuaternion = Quaternion.Identity();
-
-            // Stockage des animations
-            result.animationGroups.forEach(group => {
+            result.animationGroups.forEach((group) => {
                 this.anims[group.name.toLowerCase()] = group;
                 group.stop();
             });
 
             this.isLoaded = true;
-            this._jouerAnim("walking"); 
-        } catch (e) {
-            console.error("Erreur chargement monstre:", e);
-        }
+            this._jouerAnim("walking");
+        } catch (e) { console.error("Erreur monstre:", e); }
     }
 
     _jouerAnim(nom) {
         const anim = this.anims[nom.toLowerCase()];
         if (!this.isLoaded || !anim || this.currentAnimName === nom) return;
-
-        // On arrête l'ancienne animation proprement
-        if (this.currentAnimName && this.anims[this.currentAnimName]) {
-            this.anims[this.currentAnimName].stop();
-        }
-
-        anim.play(true); 
+        if (this.currentAnimName && this.anims[this.currentAnimName]) this.anims[this.currentAnimName].stop();
+        anim.play(true);
         this.currentAnimName = nom;
     }
 
-    update(playerPosition, onContactCallback) {
-        if (!this.isLoaded || !this.root) return;
+    _distanceXZ(posA, posB) {
+        return Math.sqrt(Math.pow(posA.x - posB.x, 2) + Math.pow(posA.z - posB.z, 2));
+    }
+
+    getPosition() { return this.collider ? this.collider.position : Vector3.Zero(); }
+    getCollisionRadius() { return this.collisionRadius; }
+
+    appliquerPoussee(pushVector) {
+        if (!this.collider || !pushVector) return;
+        const push = pushVector.clone();
+        push.y = 0;
+        this.collider.moveWithCollisions(push);
+    }
+
+    update(playerPosition) {
+        if (!this.isLoaded || !this.collider || !playerPosition) return;
 
         this.frameCount++;
-        
-        // Vérification de collision avec le joueur
-        const distanceAuJoueur = Vector3.Distance(this.root.position, playerPosition);
-        if (distanceAuJoueur < CONTACT_RADIUS) {
-            onContactCallback();
-        }
+        const enemyPos = this.collider.position;
 
-        // Recalcul de l'itinéraire via A*
+        // Détection de blocage (Anti-Stuck)
+        if (this._distanceXZ(enemyPos, this.lastPosition) < 0.005) {
+            this.stuckCounter++;
+        } else {
+            this.stuckCounter = 0;
+        }
+        if (this.stuckCounter > 15) { this.stuckMode = 20; this.stuckCounter = 0; }
+        this.lastPosition.copyFrom(enemyPos);
+
+        const distJoueur = this._distanceXZ(enemyPos, playerPosition);
+
+        // Mise à jour du chemin A*
         if (this.frameCount % RECALCUL_INTERVAL === 0 || this.chemin.length === 0) {
-            const enemyGrid = this._worldToGrid(this.root.position);
-            const cible = this._worldToGrid(playerPosition);
-            this.chemin = aStar(this.maze, enemyGrid, cible);
+            this.chemin = aStar(this.maze, this._worldToGrid(enemyPos), this._worldToGrid(playerPosition)) || [];
             if (this.chemin.length > 0) this.chemin.shift();
         }
 
-        if (this.chemin.length > 0) {
-            const cibleMonde = this._gridToWorld(this.chemin[0].row, this.chemin[0].col);
-            const directionCible = cibleMonde.subtract(this.root.position).normalize();
-            
-            /**
-             * 1. ROTATION FLUIDE (SLERP)
-             * On calcule la rotation vers la prochaine case et on y va progressivement
-             */
-            const rotationCible = Quaternion.RotationQuaternionFromAxis(
-                Vector3.Cross(Vector3.Up(), directionCible),
-                Vector3.Up(),
-                directionCible
-            );
-
-            Quaternion.SlerpToRef(
-                this.root.rotationQuaternion,
-                rotationCible,
-                VITESSE_ROTATION,
-                this.root.rotationQuaternion
-            );
-
-            /**
-             * 2. MOUVEMENT
-             * Si on est proche du point, on passe au suivant, sinon on avance
-             */
-            if (Vector3.Distance(this.root.position, cibleMonde) < 0.4) {
-                this.chemin.shift();
-            } else {
-                // On avance selon l'axe avant (forward) actuel du monstre
-                // Cela permet d'avoir des trajectoires courbes très fluides
-                const avant = this.root.forward; 
-                this.root.position.addInPlace(avant.scale(VITESSE));
-                
-                this._jouerAnim("walking");
-            }
+        let cibleMonde = null;
+        if (distJoueur <= DIRECT_CHASE_DISTANCE) {
+            // On vise le joueur presque directement pour coller au mur
+            const dir = playerPosition.subtract(enemyPos).normalize();
+            cibleMonde = playerPosition.subtract(dir.scale(STOP_DISTANCE));
+        } else if (this.chemin.length > 0) {
+            cibleMonde = this._gridToWorld(this.chemin[0].row, this.chemin[0].col);
         }
+
+        if (!cibleMonde) return;
+
+        let direction = cibleMonde.subtract(enemyPos);
+        direction.y = 0;
+
+        // Si bloqué, on ajoute une force latérale pour "glisser" le long du mur
+        if (this.stuckMode > 0) {
+            const angle = Math.PI / 3; 
+            const x = direction.x * Math.cos(angle) - direction.z * Math.sin(angle);
+            const z = direction.x * Math.sin(angle) + direction.z * Math.cos(angle);
+            direction.set(x, 0, z);
+            this.stuckMode--;
+        }
+
+        const distCible = direction.length();
+        if (distCible < 0.05) return;
+
+        direction.normalize();
+        const yaw = Math.atan2(direction.x, direction.z);
+        Quaternion.SlerpToRef(this.root.rotationQuaternion, Quaternion.FromEulerAngles(0, yaw, 0), VITESSE_ROTATION, this.root.rotationQuaternion);
+
+        // Déplacement final
+        this.collider.moveWithCollisions(direction.scale(Math.min(VITESSE, distCible)));
+        this._jouerAnim("walking");
     }
 
     _worldToGrid(pos) {
-        const totalSize = this.maze.length * this.caseSize;
-        const col = Math.floor((pos.x + totalSize / 2) / this.caseSize);
-        const row = Math.floor((pos.z + totalSize / 2) / this.caseSize);
-        return { row, col };
+        const sz = this.maze.length * this.caseSize;
+        return { row: Math.floor((pos.z + sz / 2) / this.caseSize), col: Math.floor((pos.x + sz / 2) / this.caseSize) };
     }
 
     _gridToWorld(row, col) {
-        const totalSize = this.maze.length * this.caseSize;
-        return new Vector3(
-            (col * this.caseSize) - (totalSize / 2) + (this.caseSize / 2),
-            0.1,
-            (row * this.caseSize) - (totalSize / 2) + (this.caseSize / 2)
-        );
+        const sz = this.maze.length * this.caseSize;
+        return new Vector3((col * this.caseSize) - (sz / 2) + (this.caseSize / 2), 0.9, (row * this.caseSize) - (sz / 2) + (this.caseSize / 2));
     }
 
     dispose() {
-        if (this.root) this.root.dispose();
+        Object.values(this.anims).forEach(a => a.stop());
+        if (this.collider) this.collider.dispose();
     }
 }
