@@ -24,7 +24,7 @@ export function chargerNiveau(jeux, niveau) {
         addPiece(166, 456, 17, 17, "yellow");
         addPiece(124, 133, 17, 17, "yellow");
         addPiece(555, 17, 17, 17, "yellow");
-        let size = 120;
+        let size = 100;
         jeux.sortie = new Sortie(jeux.canvas.width - size, jeux.canvas.height - size, size, size);
     }
 
@@ -33,7 +33,7 @@ export function chargerNiveau(jeux, niveau) {
         addPiece(250, 456, 17, 17, "yellow");
         addPiece(362, 120, 17, 17, "yellow");
         addPiece(555, 500, 17, 17, "yellow");
-        jeux.sortie = new Sortie(450, 10, 100, 100);
+        jeux.sortie = new Sortie(455, 10, 90, 90);
     }
 
     if (niveau == 3) { 
@@ -44,7 +44,7 @@ export function chargerNiveau(jeux, niveau) {
         addPiece(104, 331, 17, 17, "yellow");
         addPiece(439, 179, 17, 17, "yellow");
         addPiece(555, 434, 17, 17, "yellow");
-        let size = 120;
+        let size = 100;
         jeux.sortie = new Sortie(jeux.canvas.width - size, jeux.canvas.height - size, size, size);
     }
 
@@ -61,7 +61,7 @@ export function chargerNiveau(jeux, niveau) {
         addPiece(249, 555, 17, 17, "yellow");
 
 
-        let size = 120;
+        let size = 100;
         jeux.sortie = new Sortie(jeux.canvas.width - size, jeux.canvas.height - size, size, size);
     }
 
@@ -79,7 +79,7 @@ export function chargerNiveau(jeux, niveau) {
         addPiece(555, 564, 17, 17, "yellow");
         addPiece(41, 414, 17, 17, "yellow");
 
-        jeux.sortie = new Sortie(0, 481, 99, 99, "white");
+        jeux.sortie = new Sortie(0, 481, 90, 90, "white");
     }
 
     if (niveau == 6) {
@@ -117,10 +117,10 @@ export function chargerNiveau(jeux, niveau) {
     }
 
     if (niveau === 1) {
-        jeux.afficherMessageDebut("Atteignez la ligne d'arrivée !");
+        jeux.afficherMessageDebut("Atteignez la sortie !");
     } else if (niveau === 3) {
-        jeux.afficherMessageDebut("Les blocs noirs vous tuent !");
+        jeux.afficherMessageDebut("Les neons vous tuent !");
     } else if (niveau === 6) {
-        jeux.afficherMessageDebut("Activez le bouton orange pour sortir !");
+        jeux.afficherMessageDebut("Activez le bouton pour sortir !");
     }
 }

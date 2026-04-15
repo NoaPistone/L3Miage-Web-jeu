@@ -29,11 +29,63 @@ export default class Obstacle extends Objet {
         }
     }
 
+    
     draw(ctx) {
         ctx.save();
-        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
-        ctx.fillStyle = this.couleur;
-        ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+       
+        ctx.translate(this.x, this.y);
+
+        const w = this.w;
+        const h = this.h;
+        const time = Date.now() * 0.002;
+
+     
+        const neonViolet = '#bd00ff';      
+        const neonLightViolet = '#e6b3ff'; 
+        const neonGlowColor = 'rgba(189, 0, 255, 0.7)';
+
+        let bgGrad = ctx.createLinearGradient(0, 0, w, h);
+        bgGrad.addColorStop(0, '#10002b'); 
+        bgGrad.addColorStop(1, '#000000');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; 
+        ctx.strokeRect(1, 1, w - 2, h - 2);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';      
+        ctx.strokeRect(3, 3, w - 6, h - 6);
+
+        
+        ctx.shadowBlur = 25; 
+        ctx.shadowColor = neonViolet;
+
+        ctx.strokeStyle = neonLightViolet; 
+        ctx.lineWidth = 4;
+
+        
+        ctx.strokeRect(0, 0, w, h);
+
+       
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(189, 0, 255, 0.2)'; 
+
+        
+        const tubeSpacing = Math.max(h / 4, 10);
+        ctx.beginPath();
+        for (let y = tubeSpacing; y < h; y += tubeSpacing) {
+            ctx.moveTo(w * 0.1, y);
+            ctx.lineTo(w * 0.9, y);
+        }
+        ctx.stroke();
+
+        
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.beginPath();
+        ctx.moveTo(w * 0.1, h * 0.1);
+        ctx.lineTo(w * 0.3, h * 0.3);
+        ctx.stroke();
+
         ctx.restore();
     }
 
