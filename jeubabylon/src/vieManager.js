@@ -3,11 +3,24 @@ export class vieManager {
         this.vieMax = vieMax;
         this.vie = vieMax;
         this._updateUI();
+        // On récupère le calque une seule fois pour les performances
+        this.overlay = document.getElementById("damageOverlay");
     }
 
     perdreVie(degats) {
         this.vie = Math.max(0, this.vie - degats);
         this._updateUI();
+
+        // --- EFFET FLASH ROUGE ---
+        if (this.overlay) {
+            this.overlay.classList.add("active");
+            
+            // On retire le calque après 500ms
+            setTimeout(() => {
+                this.overlay.classList.remove("active");
+            }, 500);
+        }
+
         if (this.vie <= 0 && this.onMortCallback) {
             this.onMortCallback();
         }
@@ -34,7 +47,6 @@ export class vieManager {
 
     _onMort(scoreManager, gameManager) {
         console.log("💀 Le joueur est mort !");
-
 
         if (document.exitPointerLock) {
             document.exitPointerLock();

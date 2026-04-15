@@ -422,3 +422,20 @@ html, body {
 .finBoutons .menuButton {
     flex: 1;
 }
+
+/* --- CALQUE DE DÉGATS (SANG) --- */
+#damageOverlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none; /* Laisse passer les clics */
+    z-index: 9999; /* Toujours au-dessus de tout */
+    opacity: 0;
+    transition: opacity 0.1s ease-out;
+    /* Dégradé radial : centre transparent vers bords rouges sombres */
+    background: radial-gradient(circle, transparent 40%, rgba(150, 0, 0, 0.4) 80%, rgba(200, 0, 0, 0.7) 100%);
+}
+
+/* Classe activée en JS */
+#damageOverlay.active {
+    opacity: 1;
+}
