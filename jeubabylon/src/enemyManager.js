@@ -12,7 +12,7 @@ const enemiesByLevel = {
 
 const DEGATS = 10;
 const COOLDOWN = 1000;
-const MARGE_SEPARATION = 0.02; // Marge réduite pour coller davantage
+const MARGE_SEPARATION = 0.02; 
 
 export class EnemyManager {
     constructor(scene, level, maze, caseSize, vieManager) {
@@ -26,9 +26,31 @@ export class EnemyManager {
 
     _load(level, maze, caseSize) {
         const configs = enemiesByLevel[level] || [];
-        configs.forEach(config => {
+        
+        // 1. Liste de tous tes fichiers disponibles
+        let modeles = ["monstre1.glb", "monstre2.glb", "monstre3.glb", "monstre4.glb"];
+        
+        // 2. Mélange aléatoire de la liste (Algorithme de Fisher-Yates)
+        // Cela garantit un ordre différent à chaque chargement de niveau
+        for (let i = modeles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [modeles[i], modeles[j]] = [modeles[j], modeles[i]];
+        }
+
+        configs.forEach((config, index) => {
             if (maze[config.row] && maze[config.row][config.col] !== 1) {
-                this.enemies.push(new Enemy(this.scene, maze, caseSize, config.row, config.col, "monstre4.glb"));
+                // 3. On pioche le modèle correspondant à l'index de l'ennemi
+                // Le modulo (%) permet de recommencer la liste si tu as plus de 4 ennemis
+                const modelName = modeles[index % modeles.length];
+                
+                this.enemies.push(new Enemy(
+                    this.scene, 
+                    maze, 
+                    caseSize, 
+                    config.row, 
+                    config.col, 
+                    modelName
+                ));
             }
         });
     }   
@@ -58,7 +80,6 @@ export class EnemyManager {
 
         if (dist >= distMin) return;
 
-        // Gestion des dégâts
         if (now - this.dernierContact > COOLDOWN) {
             this.dernierContact = now;
             if (this.vieManager) this.vieManager.perdreVie(DEGATS);
@@ -67,12 +88,9 @@ export class EnemyManager {
         const normale = dist > 0.001 ? delta.scale(1 / dist) : new Vector3(1, 0, 0);
         const penetration = distMin - dist + MARGE_SEPARATION;
 
-        // On repousse le monstre vers l'arrière s'il "écrase" le joueur contre un mur
-        // mais avec une force modérée pour garder le contact visuel
         const pushEnemy = normale.scale(-penetration * 0.8); 
         enemy.appliquerPoussee(pushEnemy);
 
-        // Le joueur est très peu poussé pour éviter de traverser les murs par erreur
         if (playerData.player && playerData.player.appliquerPoussee) {
             playerData.player.appliquerPoussee(normale.scale(penetration * 0.2));
         }
@@ -88,5 +106,8 @@ export class EnemyManager {
         });
     }
 
-    dispose() { this.enemies.forEach(e => e.dispose()); this.enemies = []; }
+    dispose() { 
+        this.enemies.forEach(e => e.dispose()); 
+        this.enemies = []; 
+    }
 }
