@@ -28,10 +28,10 @@ export class EnemyManager {
         const configs = enemiesByLevel[level] || [];
         configs.forEach(config => {
             if (maze[config.row] && maze[config.row][config.col] !== 1) {
-                this.enemies.push(new Enemy(this.scene, maze, caseSize, config.row, config.col, "monstre2.glb"));
+                this.enemies.push(new Enemy(this.scene, maze, caseSize, config.row, config.col, "monstre3.glb"));
             }
         });
-    }
+    }   
 
     _resolvePlayerData(playerRef) {
         if (!playerRef) return { position: null };
