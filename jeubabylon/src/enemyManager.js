@@ -10,7 +10,7 @@ const enemiesByLevel = {
 };
 
 const DEGATS = 10;
-const COOLDOWN = 1500;
+const COOLDOWN = 1000;
 
 export class EnemyManager {
     constructor(scene, level, maze, caseSize, vieManager) {

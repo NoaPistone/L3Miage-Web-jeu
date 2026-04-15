@@ -1,9 +1,13 @@
-import { SceneLoader, Vector3, TransformNode } from "@babylonjs/core";
+import { SceneLoader, Vector3, TransformNode, Quaternion } from "@babylonjs/core";
 import { aStar } from "./Astar";
 
-const VITESSE = 0.04;        
+/**
+ * CONFIGURATION DU COMPORTEMENT
+ */
+const VITESSE = 0.04;        
 const RECALCUL_INTERVAL = 60; 
 const CONTACT_RADIUS = 1.2; 
+const VITESSE_ROTATION = 0.12; // Plus c'est bas, plus le virage est large (naturel)
 
 export class Enemy {
     constructor(scene, maze, caseSize, startRow, startCol, fileName) {
@@ -13,13 +17,12 @@ export class Enemy {
         this.chemin = [];
         this.frameCount = 0;
         
+        // Le Root est le "cerveau" qui se déplace
         this.root = new TransformNode("enemy_root", this.scene);
         this.mesh = null; 
         this.anims = {};
         this.isLoaded = false;
         this.currentAnimName = "";
-        this.isTurning = false; 
-        this.derniereDirection = new Vector3(0, 0, 1);
 
         this._chargerModele(fileName, startRow, startCol);
     }
@@ -27,12 +30,19 @@ export class Enemy {
     async _chargerModele(fileName, row, col) {
         try {
             const result = await SceneLoader.ImportMeshAsync("", "/assets/monstre/", fileName, this.scene);
+            
+            // On prend le premier mesh et on l'attache au root
             this.mesh = result.meshes[0];
             this.mesh.parent = this.root;
             
-            // Correction d'angle de base
+            /**
+             * CORRECTION DE L'ORIENTATION
+             * On tourne le mesh de 180° localement car le modèle 3D regarde vers l'arrière par défaut.
+             */
+            this.mesh.rotationQuaternion = null; // On force l'usage de .rotation pour l'offset
             this.mesh.rotation.y = Math.PI; 
 
+            // Initialisation de la position sur la grille
             const totalSize = this.maze.length * this.caseSize;
             this.root.position.set(
                 (col * this.caseSize) - (totalSize / 2) + (this.caseSize / 2),
@@ -40,6 +50,10 @@ export class Enemy {
                 (row * this.caseSize) - (totalSize / 2) + (this.caseSize / 2)
             );
 
+            // Initialisation du Quaternion sur le root (nécessaire pour le Slerp)
+            this.root.rotationQuaternion = Quaternion.Identity();
+
+            // Stockage des animations
             result.animationGroups.forEach(group => {
                 this.anims[group.name.toLowerCase()] = group;
                 group.stop();
@@ -52,32 +66,17 @@ export class Enemy {
         }
     }
 
-    // Modification ici pour accepter la direction cible après le virage
-    _jouerAnim(nom, cibleApresVirage = null) {
+    _jouerAnim(nom) {
         const anim = this.anims[nom.toLowerCase()];
         if (!this.isLoaded || !anim || this.currentAnimName === nom) return;
 
-        if (nom.includes("turn")) {
-            this.isTurning = true;
-        }
-
+        // On arrête l'ancienne animation proprement
         if (this.currentAnimName && this.anims[this.currentAnimName]) {
             this.anims[this.currentAnimName].stop();
         }
 
-        anim.play(nom === "walking");
+        anim.play(true); 
         this.currentAnimName = nom;
-
-        if (nom !== "walking") {
-            anim.onAnimationEndObservable.addOnce(() => {
-                // IMPORTANT : On ne tourne physiquement le monstre qu'UNE FOIS l'animation finie
-                if (cibleApresVirage) {
-                    this.root.lookAt(cibleApresVirage);
-                }
-                this.isTurning = false;
-                this._jouerAnim("walking");
-            });
-        }
     }
 
     update(playerPosition, onContactCallback) {
@@ -85,15 +84,13 @@ export class Enemy {
 
         this.frameCount++;
         
-        // Hitbox
+        // Vérification de collision avec le joueur
         const distanceAuJoueur = Vector3.Distance(this.root.position, playerPosition);
         if (distanceAuJoueur < CONTACT_RADIUS) {
             onContactCallback();
         }
 
-        // Si on est en train de jouer l'animation de virage, on ne fait rien d'autre
-        if (this.isTurning) return;
-
+        // Recalcul de l'itinéraire via A*
         if (this.frameCount % RECALCUL_INTERVAL === 0 || this.chemin.length === 0) {
             const enemyGrid = this._worldToGrid(this.root.position);
             const cible = this._worldToGrid(playerPosition);
@@ -103,34 +100,38 @@ export class Enemy {
 
         if (this.chemin.length > 0) {
             const cibleMonde = this._gridToWorld(this.chemin[0].row, this.chemin[0].col);
-            const dir = cibleMonde.subtract(this.root.position).normalize();
+            const directionCible = cibleMonde.subtract(this.root.position).normalize();
             
-            if (Vector3.Distance(this.root.position, cibleMonde) < 0.2) {
+            /**
+             * 1. ROTATION FLUIDE (SLERP)
+             * On calcule la rotation vers la prochaine case et on y va progressivement
+             */
+            const rotationCible = Quaternion.RotationQuaternionFromAxis(
+                Vector3.Cross(Vector3.Up(), directionCible),
+                Vector3.Up(),
+                directionCible
+            );
+
+            Quaternion.SlerpToRef(
+                this.root.rotationQuaternion,
+                rotationCible,
+                VITESSE_ROTATION,
+                this.root.rotationQuaternion
+            );
+
+            /**
+             * 2. MOUVEMENT
+             * Si on est proche du point, on passe au suivant, sinon on avance
+             */
+            if (Vector3.Distance(this.root.position, cibleMonde) < 0.4) {
                 this.chemin.shift();
             } else {
-                const dot = Vector3.Dot(this.derniereDirection, dir);
+                // On avance selon l'axe avant (forward) actuel du monstre
+                // Cela permet d'avoir des trajectoires courbes très fluides
+                const avant = this.root.forward; 
+                this.root.position.addInPlace(avant.scale(VITESSE));
                 
-                // Détection du besoin de tourner
-                if (dot < 0.95) { 
-                    const cross = Vector3.Cross(this.derniereDirection, dir);
-                    let animNom = "";
-
-                    if (dot < -0.8) animNom = "turn180";
-                    else if (cross.y > 0) animNom = "turnright90";
-                    else if (cross.y < 0) animNom = "turnleft90";
-                    
-                    if (animNom !== "") {
-                        // On lance l'anim, mais on passe cibleMonde pour le lookAt final
-                        this._jouerAnim(animNom, cibleMonde);
-                        this.derniereDirection.copyFrom(dir);
-                        return; // On arrête l'update ici : pas de mouvement, pas de lookAt immédiat
-                    }
-                }
-
-                // Si on arrive ici, on est en ligne droite
-                this.derniereDirection.copyFrom(dir);
-                this.root.lookAt(cibleMonde);
-                this.root.position.addInPlace(dir.scale(VITESSE));
+                this._jouerAnim("walking");
             }
         }
     }
