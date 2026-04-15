@@ -1,4 +1,4 @@
-# Projet JEU CANVAS 2D  
+# Projet JEU CANVAS 2D - NEON ESCAPE
 L3 MIAGE 
 
 
@@ -41,7 +41,8 @@ Chaque niveau apporte de nouveaux défis.
 - Bouton "Rejouer"   
 - Écran Game Over   
 - Écran Jeu Terminé   
-- Écran "Niveau Terminé" entre chaque niveau   
+- Écran "Niveau Terminé" entre chaque niveau
+- Effets Visuels  
 
 ***Gameplay***
 
@@ -63,14 +64,14 @@ Chaque niveau apporte de nouveaux défis.
 
 - Animation avec requestAnimationFrame()   
 - Gestion complète des états : menu, jeu, transition, niveau terminé, game over, victoire   
-- Écouteurs centralisés   
+- Écouteurs centralisés
+- Gestion avancée du contexte : Utilisation intensive de **shadowBlur** pour les effets néon et de **createLinearGradient / createRadialGradient** pour la profondeur.
  
 
 
 
 ## Organisation du projet  
 Le projet est organisé en plusieurs dossiers afin de séparer les responsabilités :   
-- assets/ : contient les images du jeu (ex : ligne_arrivee.png).  
 - css/ : contient le fichier style.css pour le style de la page.   
 - js/ : contient toute la logique du jeu :   
           - etats/ : gestion des différents états du jeu (Menu, GameOver, JeuTermine, Transition).   
@@ -95,9 +96,7 @@ Le projet est organisé en plusieurs dossiers afin de séparer les responsabilit
 
  
 
-## Ressources externes  
-
-- Images : ligne_arrive.png (image représentant la sortie)   
+   
  
 
 ## Utilisation d’IA  
@@ -106,7 +105,12 @@ Nous avons utilisé l’IA pour nous aider à implémenter le chronomètre pour 
 
 Prompt utilisé :   
 
-"Comment implémenter un chronomètre entre chaque niveau ?"   
+"Comment implémenter un chronomètre entre chaque niveau ?"    
+
+Générer les effets visuels de style Cyberpunk (effets de lueur Glow, filtres néon via shadowBlur) :   
+
+Prompt utilisé :  
+"Créer un effet de texte néon lisible"
 
   
 
@@ -141,4 +145,5 @@ Pour la gestion des collisions, nous nous sommes inspirés du code fourni dans l
 - Déplacement dynamique des obstacles. 
 - Disparition dynamique d’un obstacle selon le niveau.   
 - Déplacement contrôlé de l’ennemi dans une zone restreinte.   
-- Gestion propre des états du jeu.   
+- Gestion propre des états du jeu.
+- Direction Artistique Cohérente : Création d'une identité visuelle forte et uniforme sur tous les écrans (Menu, Jeu, Game Over).
