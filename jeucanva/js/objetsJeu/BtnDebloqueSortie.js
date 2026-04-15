@@ -12,9 +12,56 @@ export default class BtnDebloqueSortie extends Objet {
             return;
         }
         ctx.save();
-        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
-        ctx.fillStyle = this.couleur;
-        ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+        ctx.translate(this.x, this.y);
+
+        const w = this.w;
+        const h = this.h;
+        let baseGrad = ctx.createLinearGradient(0, 0, w, h);
+        baseGrad.addColorStop(0, '#333');
+        baseGrad.addColorStop(1, '#111');
+
+        ctx.fillStyle = baseGrad;
+        
+        const r = 5;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, w, h, r);
+        ctx.fill();
+
+        
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(2, 2, w - 4, h - 4);
+
+        
+        const padding = 8;
+        const btnW = w - (padding * 2);
+        const btnH = h - (padding * 2);
+
+       
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00ff88';
+
+        
+        
+        let btnGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, btnW);
+        btnGrad.addColorStop(0, '#eeffcc'); 
+        btnGrad.addColorStop(0.5, '#00ff88'); 
+        btnGrad.addColorStop(1, '#004422');  
+
+        ctx.fillStyle = btnGrad;
+        ctx.beginPath();
+        ctx.roundRect(padding, padding, btnW, btnH, 3);
+        ctx.fill();
+
+        
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding + 5, h / 2);
+        ctx.lineTo(w - padding - 5, h / 2);
+        ctx.stroke();
+
         ctx.restore();
     }
 

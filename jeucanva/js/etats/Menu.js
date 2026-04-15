@@ -22,22 +22,40 @@ export default class Menu {
 
     draw() {
         this.ctx.save();
-
-        let grad = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        grad.addColorStop(0, "#7ae3df");
-        grad.addColorStop(1, "#fad0c4");
-        this.ctx.fillStyle = grad;
+        this.ctx.fillStyle = "#050505";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "bold 60px 'Bungee', sans-serif";
+
+        this.ctx.strokeStyle = "rgba(0, 255, 255, 0.1)";
+        this.ctx.lineWidth = 1;
+        const gridSize = 50;
+        this.ctx.beginPath();
+        for (let x = 0; x <= this.canvas.width; x += gridSize) {
+            this.ctx.moveTo(x, 0); this.ctx.lineTo(x, this.canvas.height);
+        }
+        for (let y = 0; y <= this.canvas.height; y += gridSize) {
+            this.ctx.moveTo(0, y); this.ctx.lineTo(this.canvas.width, y);
+        }
+        this.ctx.stroke();
+        this.ctx.font = "bold 50px 'Bungee', sans-serif";
         this.ctx.textAlign = "center";
-        this.ctx.shadowColor = "rgba(0,0,0,0.5)";
-        this.ctx.shadowBlur = 25;
-        this.ctx.fillText("JEU CANVAS", this.canvas.width / 2, 150);
-        this.ctx.fillStyle = "#b968d3";
+       
+        this.ctx.shadowColor = "#00ffff";
+        this.ctx.shadowBlur = 15;
+        this.ctx.fillStyle = "#ffffff"; 
+        this.ctx.fillText("NEON ESCAPE", this.canvas.width / 2, 180);
+
         this.ctx.shadowBlur = 0;
-        this.boutonJouer.draw(this.ctx);
+        this.ctx.strokeStyle = "#00ffff";
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.canvas.width / 2 - 100, 200);
+        this.ctx.lineTo(this.canvas.width / 2 + 100, 200);
+        this.ctx.stroke();
         this.ctx.restore();
+
+        if (this.boutonJouer) {
+            this.boutonJouer.draw(this.ctx);
+        }
     }
 
     handleClick(event) {

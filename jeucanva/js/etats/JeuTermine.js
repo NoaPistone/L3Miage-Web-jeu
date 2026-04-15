@@ -28,6 +28,7 @@ export default class JeuTermine {
         });
     }
 
+
     draw() {
         let ctx = this.ctx;
         let w = this.jeux.canvas.width;
@@ -35,37 +36,59 @@ export default class JeuTermine {
 
         this.ctx.save();
 
-
-        let grad = this.ctx.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, "#0f2027");
-        grad.addColorStop(0.5, "#203a43");
-        grad.addColorStop(1, "#2c5364");
-
-        this.ctx.fillStyle = grad;
+    
+        this.ctx.fillStyle = "#050505";
         this.ctx.fillRect(0, 0, w, h);
+
+        this.ctx.strokeStyle = "rgba(0, 255, 150, 0.08)";
+        this.ctx.lineWidth = 0.5;
+        const gridSize = 40;
+        this.ctx.beginPath();
+        for (let x = 0; x <= w; x += gridSize) {
+            this.ctx.moveTo(x, 0); this.ctx.lineTo(x, h);
+        }
+        for (let y = 0; y <= h; y += gridSize) {
+            this.ctx.moveTo(0, y); this.ctx.lineTo(w, y);
+        }
+        this.ctx.stroke();
 
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
 
-
-        this.ctx.font = "60px Bungee";
-        this.ctx.fillStyle = "white";
-        this.ctx.shadowColor = "rgba(0,0,0,0.7)";
-        this.ctx.shadowBlur = 20;
-
-        this.ctx.fillText(" JEU TERMINÉ ", w / 2, h / 2 - 200);
-
-
+        
+        this.ctx.font = "bold 45px 'Bungee', sans-serif";
+        this.ctx.shadowColor = "#00ffaa";
+        this.ctx.shadowBlur = 15;
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.fillText("MISSION COMPLETE", w / 2, h / 2 - 180);
         this.ctx.shadowBlur = 0;
-        this.ctx.font = "22px Bungee";
-        this.ctx.fillStyle = "#dddddd";
-        this.ctx.fillText(`Score final : ${this.jeux.score}`, w / 2, h / 2 - 50);
-        this.ctx.fillText(`Vies restantes : ${this.jeux.vies}`, w / 2, h / 2 - 5);
-        ctx.fillText(`Temps du dernier niveau : ${this.jeux.getTempsActuel()} s`, w / 2, h / 2 + 40);
-        this.btnRejouer.draw(ctx);
-        this.ctx.restore();
-    }
+        this.ctx.font = "18px 'Bungee', sans-serif";
+        this.ctx.fillStyle = "#00ffaa"; 
+        const statsY = h / 2 - 40;
+        this.ctx.fillText(`SCORE FINAL : ${this.jeux.score}`, w / 2, statsY);
 
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.font = "14px 'Bungee', sans-serif";
+        this.ctx.fillText(`VIES RESTANTES : ${this.jeux.vies}`, w / 2, statsY + 40);
+        this.ctx.fillText(`TEMPS DERNIER NIVEAU : ${this.jeux.getTempsActuel()}S`, w / 2, statsY + 70);
+
+        
+        this.ctx.strokeStyle = "rgba(0, 255, 150, 0.5)";
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.moveTo(w / 2 - 100, statsY - 20);
+        this.ctx.lineTo(w / 2 + 100, statsY - 20);
+        this.ctx.stroke();
+
+        
+        this.ctx.restore();
+
+        if (this.btnRejouer) {
+            this.btnRejouer.x = w / 2 - (this.btnRejouer.w / 2);
+            this.btnRejouer.y = h / 2 + 120;
+            this.btnRejouer.draw(ctx);
+        }
+    }
 
     handleClick(mx, my) {
         this.btnRejouer.handleClick(mx, my);

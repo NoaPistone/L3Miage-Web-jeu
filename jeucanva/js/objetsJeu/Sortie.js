@@ -1,5 +1,5 @@
 const imgSortie = new Image();
-imgSortie.src = "./assets/ligne_arrive.png"; 
+imgSortie.src = "./assets/ligne_arrive.png";
 let imgLoaded = false;
 
 imgSortie.onload = () => { imgLoaded = true; };
@@ -14,23 +14,58 @@ export default class Sortie {
   }
 
 
-  draw(ctx, active = true) {
+
+  draw(ctx) {
     let w = (this.width !== undefined) ? this.width : this.w;
     let h = (this.height !== undefined) ? this.height : this.h;
-    ctx.save();
-    ctx.translate(this.x + w / 2, this.y + h / 2);
 
-    if (imgLoaded) {
-      ctx.drawImage(imgSortie, -w / 2, -h / 2, w, h);
-    } else {
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(-w / 2, -h / 2, w, h);
-    }
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, w, h);
+
+    
+    ctx.shadowBlur = 0;
+
+    
+    let borderGrad = ctx.createLinearGradient(0, 0, w, h);
+    borderGrad.addColorStop(0, '#00ffff');
+    borderGrad.addColorStop(1, '#000066');
+
+    ctx.strokeStyle = borderGrad;
+    ctx.lineWidth = 4;
+
+   
+    const b = 15;
+
+    ctx.beginPath();
+    ctx.moveTo(b, 0);               
+    ctx.lineTo(w - b, 0);          
+    ctx.lineTo(w, b);              
+    ctx.lineTo(w, h - b);         
+    ctx.lineTo(w - b, h);          
+    ctx.lineTo(b, h);               
+    ctx.lineTo(0, h - b);         
+    ctx.lineTo(0, b);             
+    ctx.closePath();
+    ctx.stroke();
+
+   
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 10; 
+    ctx.shadowColor = '#ffffff';
+
+    const pS = 3; 
+   
+    ctx.fillRect(b - pS / 2, -pS / 2, pS, pS);         
+    ctx.fillRect(w - b - pS / 2, -pS / 2, pS, pS);    
+    ctx.fillRect(b - pS / 2, h - pS / 2, pS, pS);    
+    ctx.fillRect(w - b - pS / 2, h - pS / 2, pS, pS); 
 
     ctx.restore();
   }
-
 
 
   estAtteint(joueur) {
