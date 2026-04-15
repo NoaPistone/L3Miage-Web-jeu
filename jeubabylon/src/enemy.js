@@ -72,7 +72,7 @@ export class Enemy {
             });
 
             this.isLoaded = true;
-            this._jouerAnim("walking");
+            this._jouerAnim("running");
         } catch (e) { console.error("Erreur monstre:", e); }
     }
 
@@ -153,7 +153,7 @@ export class Enemy {
 
         // Déplacement final
         this.collider.moveWithCollisions(direction.scale(Math.min(VITESSE, distCible)));
-        this._jouerAnim("walking");
+        this._jouerAnim("running");
     }
 
     _worldToGrid(pos) {
