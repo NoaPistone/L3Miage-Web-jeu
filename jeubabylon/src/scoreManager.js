@@ -12,7 +12,7 @@ export class ScoreManager {
     }
 
     setExitPosition(pos) {
-        this.exitPosition = pos; 
+        this.exitPosition = pos;
     }
 
 
@@ -54,7 +54,7 @@ export class ScoreManager {
 
         this.scene.onBeforeRenderObservable.add(updateArrow);
 
-        
+
         this.flecheActive = fleche;
         this.flecheObserver = updateArrow;
 
@@ -63,7 +63,7 @@ export class ScoreManager {
         }, 15000);
     }
 
-    
+
     supprimerFleche() {
         if (this.flecheObserver) {
             this.scene.onBeforeRenderObservable.removeCallback(this.flecheObserver);
@@ -93,7 +93,7 @@ export class ScoreManager {
                 break;
             case "carte":
                 this.score += 15;
-                this.activerCarte(); 
+                this.activerCarte();
                 console.log("🗺️ +15 points ! Score :", this.score);
                 break;
             case "boost":
@@ -102,12 +102,12 @@ export class ScoreManager {
                 break;
             case "bottle":
                 this.score += 5;
-                if (this.vieManager) this.vieManager.regagnerVie(20); 
+                if (this.vieManager) this.vieManager.regagnerVie(20);
                 console.log("🍶 +5 points ! Score :", this.score);
                 break;
             case "apple":
                 this.score += 2;
-                if (this.vieManager) this.vieManager.regagnerVie(10); 
+                if (this.vieManager) this.vieManager.regagnerVie(10);
                 console.log("🍎 +2 points ! Score :", this.score);
                 break;
             default:
@@ -130,4 +130,20 @@ export class ScoreManager {
         this.score = 0;
         this._updateUI();
     }
+
+    envoyerScore() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        fetch('/api/scores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ jeu: 'jeu2', score: this.score })
+        });
+    }
+
+
+    
 }

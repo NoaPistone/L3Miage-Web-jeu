@@ -225,6 +225,18 @@ export class GameManager {
                 const min = Math.floor(totalSecondes / 60).toString().padStart(2, "0");
                 const sec = (totalSecondes % 60).toString().padStart(2, "0");
 
+                const token = localStorage.getItem('token');
+                if (token) {
+                    fetch('/api/scores', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ jeu: 'jeu2', score: this.scoreManager.getScore() })
+                    });
+                }
+
                 document.getElementById("finScoreValue").textContent = this.scoreManager.getScore();
                 document.getElementById("finTempsValue").textContent = `${min}:${sec}`;
                 document.getElementById("finJeu").classList.remove("hidden");

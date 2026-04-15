@@ -15,6 +15,19 @@ export default class JeuTermine {
         });
     }
 
+    envoyerScore() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        fetch('/api/scores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ jeu: 'jeu1', score: this.jeux.score })
+        });
+    }
+
     draw() {
         let ctx = this.ctx;
         let w = this.jeux.canvas.width;
