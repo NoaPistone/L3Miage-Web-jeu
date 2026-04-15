@@ -32,20 +32,18 @@ export class Joueur {
         this.boostActif = false;
         this.boostTimeout = null;
 
-        // --- REGLAGES CAMERA CORRIGÉS ---
-        // On augmente l'offset pour ne pas voir l'intérieur du crâne
-        this.camForwardIdle = 0.22; 
+        this.camForwardIdle = 0.22;
         this.camForwardRun = 0.25;
         this.currentCamForward = this.camForwardIdle;
         this.camHeightOffset = 0.08;
 
-        // Animations
         this.animationGroups = [];
         this.animStanding = null;
         this.animRunning = null;
         this.animActuelle = null;
 
-        // --- COLLIDER (ELLIPSOIDE AGRANDI) ---
+        this.etaitEnMouvement = false;
+
         this.collider = MeshBuilder.CreateBox(
             "playerCollider",
             { width: 0.8, depth: 0.8, height: 1.8 },
@@ -54,9 +52,8 @@ export class Joueur {
         this.collider.isVisible = false;
         this.collider.position = new Vector3(0, 0.9, 0);
         this.collider.checkCollisions = true;
-        
-        // On augmente légèrement le rayon (0.45) pour empêcher la caméra de coller aux murs
-        this.collider.ellipsoid = new Vector3(0.45, 0.9, 0.45); 
+
+        this.collider.ellipsoid = new Vector3(0.45, 0.9, 0.45);
         this.collider.ellipsoidOffset = new Vector3(0, 0.9, 0);
 
         this._setupInputs();
@@ -68,9 +65,7 @@ export class Joueur {
             this.scene
         );
 
-        // --- CORRECTION NEAR CLIP ---
-        // minZ à 0.01 permet de ne pas faire disparaître les murs quand on est collé
-        this.camera.minZ = 0.01; 
+        this.camera.minZ = 0.01;
         this.camera.fov = 1.1;
         this.camera.inputs.clear();
         this.camera.speed = 0;
@@ -139,19 +134,43 @@ export class Joueur {
                 this.skeleton = result.skeletons[0];
             }
 
-            this.bodyMesh = result.meshes.find(m => m.skeleton === this.skeleton) || result.meshes[1] || null;
+            this.bodyMesh =
+                result.meshes.find((m) => m.skeleton === this.skeleton) ||
+                result.meshes[1] ||
+                null;
 
             if (this.bodyMesh && this.skeleton) {
-                this.headBone = this.skeleton.bones.find(b => /head/i.test(b.name));
+                this.headBone = this.skeleton.bones.find((b) => /head/i.test(b.name));
             }
 
             this.animationGroups = result.animationGroups;
-            this.animStanding = this.animationGroups.find(a => a.name.toLowerCase().includes("standing") || a.name.toLowerCase().includes("idle"));
-            this.animRunning = this.animationGroups.find(a => a.name.toLowerCase().includes("running") || a.name.toLowerCase().includes("run"));
+            this.animStanding = this.animationGroups.find(
+                (a) =>
+                    a.name.toLowerCase().includes("standing") ||
+                    a.name.toLowerCase().includes("idle")
+            );
+            this.animRunning = this.animationGroups.find(
+                (a) =>
+                    a.name.toLowerCase().includes("running") ||
+                    a.name.toLowerCase().includes("run")
+            );
 
-            this.animationGroups.forEach(a => a.stop());
+            this.animationGroups.forEach((group) => {
+                group.stop();
+                group.targetedAnimations.forEach((ta) => {
+                    ta.animation.enableBlending = true;
+                    ta.animation.blendingSpeed = 0.1;
+                });
+            });
+
             if (this.animStanding) {
-                this.animStanding.start(true, 1.0, this.animStanding.from, this.animStanding.to, false);
+                this.animStanding.start(
+                    true,
+                    1.0,
+                    this.animStanding.from,
+                    this.animStanding.to,
+                    false
+                );
                 this.animActuelle = this.animStanding;
             }
 
@@ -163,7 +182,8 @@ export class Joueur {
 
     _jouerAnimation(anim) {
         if (!anim || anim === this.animActuelle) return;
-        this.animationGroups.forEach(a => a.stop());
+
+        this.animationGroups.forEach((a) => a.stop());
         anim.start(true, 1.0, anim.from, anim.to, false);
         this.animActuelle = anim;
     }
@@ -177,7 +197,6 @@ export class Joueur {
             Math.cos(this.yaw)
         );
 
-        // On force le recalcul pour éviter que la caméra "lag" derrière l'animation
         this.root?.computeWorldMatrix(true);
         if (this.bodyMesh) this.bodyMesh.computeWorldMatrix(true);
 
@@ -187,6 +206,26 @@ export class Joueur {
         } else {
             basePos = this.collider.position.add(new Vector3(0, 0.78, 0));
         }
+
+        const cameraWorldPos = basePos
+            .add(new Vector3(0, this.camHeightOffset, 0))
+            .add(forward.scale(this.currentCamForward));
+
+        this.camera.position.copyFrom(cameraWorldPos);
+        this.camera.rotation.x = this.pitch;
+        this.camera.rotation.y = this.yaw;
+    }
+
+    _updateCameraFromCollider() {
+        if (!this.camera || !this.collider) return;
+
+        const forward = new Vector3(
+            Math.sin(this.yaw),
+            0,
+            Math.cos(this.yaw)
+        );
+
+        const basePos = this.collider.position.add(new Vector3(0, 0.86, 0));
 
         const cameraWorldPos = basePos
             .add(new Vector3(0, this.camHeightOffset, 0))
@@ -210,6 +249,7 @@ export class Joueur {
         if (this.inputMap["d"]) move.addInPlace(right);
 
         const enMouvement = move.lengthSquared() > 0;
+        const changementEtat = enMouvement !== this.etaitEnMouvement;
 
         if (enMouvement) {
             move.normalize();
@@ -224,16 +264,22 @@ export class Joueur {
                 this._jouerAnimation(this.animStanding);
             }
 
-            // Smoothing de la position caméra
             const cibleOffset = enMouvement ? this.camForwardRun : this.camForwardIdle;
             this.currentCamForward += (cibleOffset - this.currentCamForward) * 0.15;
 
-            this._updateCameraFromHead();
+            if (changementEtat) {
+                this._updateCameraFromCollider();
+            } else {
+                this._updateCameraFromHead();
+            }
         }
+
+        this.etaitEnMouvement = enMouvement;
     }
 
     activerBoost(duree = 10000) {
         if (this.boostActif) return;
+
         this.boostActif = true;
         this.vitesse = 0.18;
         this.boostTimeout = setTimeout(() => this.desactiverBoost(), duree);
@@ -242,6 +288,10 @@ export class Joueur {
     desactiverBoost() {
         this.vitesse = 0.08;
         this.boostActif = false;
-        if (this.boostTimeout) clearTimeout(this.boostTimeout);
+
+        if (this.boostTimeout) {
+            clearTimeout(this.boostTimeout);
+            this.boostTimeout = null;
+        }
     }
 }
