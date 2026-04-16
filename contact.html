@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Noa & Biljana</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="../assets/logo.png">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="about.html">À Propos</a></li>
+                <li><a href="scores.html">Score</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <i class="fas fa-user-circle" id="login-icon"></i>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>L'Équipe du <span style="color:var(--accent-red)">Projet</span></h1>
+                <p>Étudiants en <strong>Licence 3 MIAGE</strong>.</p>
+            </div>
+        </section>
+
+        <section class="game-list" style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;">
+            
+            <div class="game-item" style="width: auto; padding: 20px 40px;">
+                <div class="game-info" style="text-align: center;">
+                    <h4>NOA PISTONE</h4>
+                </div>
+            </div>
+
+            <div class="game-item" style="width: auto; padding: 20px 40px;">
+                <div class="game-info" style="text-align: center;">
+                    <h4>BILJANA DJORDJEVIC</h4>
+                </div>
+            </div>
+
+        </section>
+
+        <div id="auth-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2 id="modal-title">Connexion</h2>
+                <input type="text" id="username" placeholder="Pseudo">
+                <input type="password" id="password" placeholder="Mot de passe">
+                <button id="btn-action" class="btn-primary">Se connecter</button>
+                <button id="close-modal">Fermer</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Noa Pistone & Biljana Djordjevic</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
