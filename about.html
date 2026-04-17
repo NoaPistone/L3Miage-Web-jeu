@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À Propos - Nos Jeux</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="../assets/logo.png">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="../assets/logo.png" alt="Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="apropos.html">À Propos</a></li>
+                <li><a href="scores.html">Score</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <i class="fas fa-user-circle" id="login-icon"></i>
+            </div>
+        </nav>
+    </header>
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Connexion</h2>
+            <input type="text" id="username" placeholder="Pseudo">
+            <input type="password" id="password" placeholder="Mot de passe">
+            <div id="auth-error" style="color: red; font-size: 0.8rem; margin-bottom: 10px;"></div>
+
+            <button id="btn-action" class="btn-primary">Se connecter</button>
+            <p id="toggle-auth">Pas de compte ? <span style="color:red; cursor:pointer;">Créer un compte</span></p>
+            <button id="close-modal">Fermer</button>
+        </div>
+    </div>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Comment <span style="color:var(--accent-red)">Jouer ?</span></h1>
+                <p>Voici les règles simples pour jouer.</p>
+            </div>
+        </section>
+
+        <section class="game-list">
+
+            <div class="game-item">
+                <div class="game-info">
+                    <h4>NEON ESCAPE</h4>
+                    <p><strong>But :</strong> Atteindre la porte de sortie sans toucher les obstacles.</p>
+                    <p><strong>Contrôles :</strong> Utilisez les flèches du clavier pour diriger votre joueur.</p>
+                </div>
+            </div>
+
+            <div class="game-item">
+                <div class="game-info">
+                    <h4>LE LABYRINTHE</h4>
+                    <p><strong>But :</strong> Trouver la sortie du labyrinthe.</p>
+                    <p><strong>Contrôles :</strong> La souris pour regarder autour de vous et les touches ZQSD.</p>
+                </div>
+            </div>
+
+            <div class="game-item">
+                <div class="game-info">
+                    <h4>PUISSANCE 4</h4>
+                    <p><strong>But :</strong> Aligner 4 pions horizontalement, verticalement ou en diagonale.</p>
+                    <p><strong>Spécial :</strong> Cliquez sur les colonnes pour placer votre pion. Jouez à deux sur le
+                        même écran !</p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Noa Pistone & Biljana Djordjevic</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

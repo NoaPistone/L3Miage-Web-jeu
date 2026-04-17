@@ -129,6 +129,7 @@ export default class Jeux {
         });
         if (this.vies <= 0) {
             this.etat = "GAME OVER";
+            //this.fin.envoyerScore();
             this.timerActif = false;
             this.tempsNiveau = 0
             console.log("jeu terminé");
@@ -267,6 +268,7 @@ export default class Jeux {
                 this.arreterTimer();
 
                 this.etat = "JEU TERMINE";
+                this.JeuTermine.envoyerScore();
                 console.log("jeu terminé");
             }
         }

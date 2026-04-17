@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puissance 4 - Mode ARAM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="mode-selector">
+        <div class="modal-content">
+            <h2 style="color: white; margin-bottom: 20px;">CHOISIR LE MODE</h2>
+            <button class="btn-primary" onclick="game.setMode('classic')">CLASSIQUE</button>
+            <button class="btn-primary aram-btn" onclick="game.setMode('aram')">MODE ARAM</button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <div id="inventory-p1" class="inventory side-panel">
+            <h3>ROUGE</h3>
+            <div class="special-item" id="p1-exp-cross" onclick="game.selectSpecial('cross')">
+                <div class="disc special-black exp-cross"></div>
+                <span class="count" id="cnt-p1-cross">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Explosion en Croix : Détruit les jetons adjacents (haut, bas, gauche, droite).</span></div>
+            </div>
+            <div class="special-item" id="p1-exp-diag" onclick="game.selectSpecial('diag')">
+                <div class="disc special-black exp-diag"></div>
+                <span class="count" id="cnt-p1-diag">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Explosion Diagonale : Détruit les jetons dans les coins.</span></div>
+            </div>
+            <div class="special-item" id="p1-flash" onclick="game.activateFlash()">
+                <div class="flash-btn">FLASH</div>
+                <span class="count" id="cnt-p1-flash">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Flashbang : Rend le plateau blanc pour l'adversaire.</span></div>
+            </div>
+        </div>
+
+        <div class="game-core">
+            <div class="header">
+                <h1>PUISSANCE <span class="p1-text">4</span></h1>
+                <p id="mode-display">Mode: Classique</p>
+            </div>
+
+            <div class="scoreboard">
+                <div id="p1-score-card" class="player-score active">
+                    <span class="p1-text">Rouge</span>
+                    <span id="p1-wins" class="score-val">0</span>
+                </div>
+                <div id="p2-score-card" class="player-score">
+                    <span class="p2-text">Jaune</span>
+                    <span id="p2-wins" class="score-val">0</span>
+                </div>
+            </div>
+
+            <div class="status-bar" id="game-status">Tour du Joueur Rouge</div>
+
+            <div class="controls">
+                <button id="btn-undo">Annuler</button>
+                <button class="btn-primary" id="btn-new-round">Nouvelle Manche</button>
+                <button id="btn-reset">Reset Match</button>
+                <div class="toggle-container">
+                    <input type="checkbox" id="sound-toggle" checked> <label for="sound-toggle">Sons</label>
+                </div>
+            </div>
+
+            <div class="board-container" id="board-container">
+                <div id="discs-container"></div>
+                <svg id="board-svg" viewBox="0 0 500 430">
+                    <defs>
+                        <mask id="grid-mask">
+                            <rect width="500" height="430" fill="white" />
+                            <g id="mask-holes"></g>
+                        </mask>
+                    </defs>
+                    <rect width="500" height="430" fill="#1e3799" mask="url(#grid-mask)" />
+                </svg>
+                <svg id="win-layer-svg" viewBox="0 0 500 430"><g id="win-highlights-layer"></g></svg>
+                <div id="click-grid" class="click-grid"></div>
+            </div>
+        </div>
+
+        <div id="inventory-p2" class="inventory side-panel">
+            <h3>JAUNE</h3>
+            <div class="special-item" id="p2-exp-cross" onclick="game.selectSpecial('cross')">
+                <div class="disc special-black exp-cross"></div>
+                <span class="count" id="cnt-p2-cross">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Explosion en Croix : Détruit les jetons adjacents.</span></div>
+            </div>
+            <div class="special-item" id="p2-exp-diag" onclick="game.selectSpecial('diag')">
+                <div class="disc special-black exp-diag"></div>
+                <span class="count" id="cnt-p2-diag">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Explosion Diagonale : Détruit les jetons dans les coins.</span></div>
+            </div>
+            <div class="special-item" id="p2-flash" onclick="game.activateFlash()">
+                <div class="flash-btn">FLASH</div>
+                <span class="count" id="cnt-p2-flash">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Flashbang : Cache les couleurs au prochain tour.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Match Terminé !</h2>
+            <button class="btn-primary" id="btn-modal-reset">Rejouer</button>
+        </div>
+    </div>
+
+    <audio id="sfx-drop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

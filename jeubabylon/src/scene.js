@@ -1,12 +1,14 @@
-import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3  } from "@babylonjs/core";
+import { MeshBuilder, StandardMaterial, CubeTexture, Texture, Color3, HemisphericLight, Vector3, SceneLoader } from "@babylonjs/core";
+import "@babylonjs/loaders";
+import { Joueur } from "./joueur.js"; 
 
 export function addSkybox(scene) {
-    // Création du cube géant
+    
     const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000 }, scene);
     const skyboxMaterial = new StandardMaterial("skyBoxMaterial", scene);
     skyboxMaterial.backFaceCulling = false;
 
-    // Chargement Vite-compatible des 6 faces du skybox depuis `src/assets/skybox`
+    
     const px = new URL("./assets/skybox/skybox_px.jpg", import.meta.url).href;
     const py = new URL("./assets/skybox/skybox_py.jpg", import.meta.url).href;
     const pz = new URL("./assets/skybox/skybox_pz.jpg", import.meta.url).href;
@@ -25,18 +27,46 @@ export function addSkybox(scene) {
 }
 
 export function addGround(scene) {
+    
+    const ground = MeshBuilder.CreateGround("ground", { width: 90, height: 90 }, scene);
+    
+    
+    const groundMaterial = new StandardMaterial("groundMaterial", scene);
+    
+    
+    const groundTextureUrl = new URL("./assets/textures/ground1.jpg", import.meta.url).href;
+    const groundTexture = new Texture(groundTextureUrl, scene);
+    
+     
+    groundTexture.uScale = 20; 
+    groundTexture.vScale = 20; 
+    
+    groundMaterial.diffuseTexture = groundTexture;
+    
+    
+    groundMaterial.specularColor = new Color3(0, 0, 0);
+    
+    ground.material = groundMaterial;
+
+    
+    ground.checkCollisions = true;
+
+    return ground;
+}
+
+export function addGround1(scene) {
     const ground = MeshBuilder.CreateGround(
         "ground",
-        { width: 30, height: 30 },
+        { width: 40, height: 40 },
         scene
     );
 
     const groundMaterial = new StandardMaterial("groundMaterial", scene);
 
-    // Gris très sombre
+    
     groundMaterial.diffuseColor = new Color3(0.18, 0.18, 0.18);
 
-    // Supprime l’effet brillant qui crée des ronds lumineux
+   
     groundMaterial.specularColor = new Color3(0, 0, 0);
 
     ground.material = groundMaterial;
@@ -45,15 +75,42 @@ export function addGround(scene) {
 }
 
 
+export function addCeiling(scene, wallHeight) {
+    const ceiling = MeshBuilder.CreateGround("ceiling", { width: 100, height: 100 }, scene);
+    ceiling.position.y = wallHeight;
+    
+    
+    ceiling.rotation.x = Math.PI; 
+
+    const ceilingMaterial = new StandardMaterial("ceilingMat", scene);
+    
+    
+    const textureUrl = new URL("./assets/textures/wall4.jpg", import.meta.url).href;
+    ceilingMaterial.diffuseTexture = new Texture(textureUrl, scene);
+    
+    
+    ceilingMaterial.backFaceCulling = false; 
+    
+    
+    ceilingMaterial.emissiveColor = new Color3(0.3, 0.3, 0.3); 
+    
+    
+    ceilingMaterial.diffuseTexture.uScale = 20;
+    ceilingMaterial.diffuseTexture.vScale = 20;
+
+    ceilingMaterial.specularColor = new Color3(0, 0, 0);
+    ceiling.material = ceilingMaterial;
+
+    console.log("Plafond créé à la hauteur : " + wallHeight);
+    return ceiling;
+}
+
+
+
 
 export function setupLightingAndFog(scene) {
-    // Lumière faible
+    
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-    light.intensity = 0.4; // un peu plus lumineux pour voir les murs
-
-
-    // Fond noir 
-    ////scene.fogMode = 1; 
-    ////scene.fogDensity = 0.02;
-    ////scene.fogColor = new Color3(0.02, 0.02, 0.02);
+    light.intensity = 0.4; 
 }
+

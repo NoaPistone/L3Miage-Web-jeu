@@ -1,0 +1,62 @@
+:root {
+    --bg-color: #0f172a;
+    --p1-color: #d63031;
+    --p2-color: #f39c12;
+    --cell-size: 60px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { background-color: var(--bg-color); color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+
+/* --- MISE EN PAGE --- */
+.main-layout { display: flex; align-items: center; justify-content: center; gap: 50px; width: 100%; }
+.side-panel { background: rgba(30, 41, 59, 0.7); padding: 25px; border-radius: 20px; border: 2px solid #334155; min-width: 150px; text-align: center; }
+
+/* --- JETONS SPÉCIAUX NOIRS --- */
+.special-black { background-color: #1a1a1a !important; color: white !important; border: 2px solid #444; }
+
+.exp-cross::after { content: '╋'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; animation: pulseCross 2s infinite; }
+.exp-diag::after { content: '✖'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; animation: rotateX 4s linear infinite; }
+
+@keyframes pulseCross { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes rotateX { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+.special-item { position: relative; cursor: pointer; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; padding: 10px; border-radius: 10px; }
+.special-item.selected { background: rgba(255, 255, 255, 0.2); outline: 2px solid white; }
+.special-item.used { opacity: 0.1; pointer-events: none; }
+
+/* --- TOOLTIPS ORIENTÉS --- */
+.info-bubble { position: absolute; top: 0; right: 0; background: #3498db; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: help; }
+.tooltip { visibility: hidden; width: 180px; background: #000; color: #fff; text-align: center; border-radius: 6px; padding: 10px; position: absolute; z-index: 100; top: 0; opacity: 0; transition: 0.3s; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; }
+
+/* Joueur de gauche : Tooltip à GAUCHE */
+.tooltip.left { right: 130%; } 
+/* Joueur de droite : Tooltip à DROITE */
+.tooltip.right { left: 130%; }
+
+.info-bubble:hover .tooltip { visibility: visible; opacity: 1; }
+
+/* --- PLATEAU --- */
+.board-container { position: relative; width: 500px; height: 430px; background: #050505; border-radius: 10px; }
+#board-svg { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+.click-grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 1fr); z-index: 20; }
+#discs-container { position: absolute; inset: 0; z-index: 5; }
+
+.disc { width: var(--cell-size); height: var(--cell-size); border-radius: 50%; position: absolute; transition: transform 0.6s cubic-bezier(0.45, 0, 0.55, 1); background-color: currentColor; }
+.disc.player1 { color: var(--p1-color); }
+.disc.player2 { color: var(--p2-color); }
+.exploding { animation: explodeAnim 0.5s forwards; }
+
+@keyframes explodeAnim { 0% { transform: scale(1); } 50% { transform: scale(1.8); opacity: 0.7; filter: brightness(2); } 100% { transform: scale(0); opacity: 0; } }
+
+/* UI */
+.scoreboard { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+.player-score { opacity: 0.4; transition: 0.3s; }
+.player-score.active { opacity: 1; transform: scale(1.1); }
+.score-val { font-size: 30px; font-weight: bold; }
+#mode-selector, #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+#modal { display: none; }
+.modal-content { background: #1e293b; padding: 40px; border-radius: 20px; text-align: center; }
+button { padding: 10px 20px; cursor: pointer; border-radius: 8px; border: none; font-weight: bold; margin: 5px; }
+.btn-primary { background: #10b981; color: white; }
+.flash-active .disc { background-color: white !important; filter: blur(1px); }
