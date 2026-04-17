@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
     <header>
@@ -26,12 +28,25 @@
         </nav>
     </header>
 
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Connexion</h2>
+            <input type="text" id="username" placeholder="Pseudo">
+            <input type="password" id="password" placeholder="Mot de passe">
+            <div id="auth-error" style="color: red; font-size: 0.8rem; margin-bottom: 10px;"></div>
+
+            <button id="btn-action" class="btn-primary">Se connecter</button>
+            <p id="toggle-auth">Pas de compte ? <span style="color:red; cursor:pointer;">Créer un compte</span></p>
+            <button id="close-modal">Fermer</button>
+        </div>
+    </div>
+
     <main>
         <section class="scores-container-main">
             <h2 style="margin-bottom: 2rem; border-left: 4px solid var(--accent-red); padding-left: 15px;">
                 🏆 Mes meilleurs scores
             </h2>
-            
+
             <div id="scores-container" class="scores-grid">
                 <p class="status-msg">Chargement des scores...</p>
             </div>
@@ -72,15 +87,15 @@
 
                 for (const [jeu, scores] of Object.entries(data)) {
                     const card = document.createElement('div');
-                    card.className = 'score-card'; // Utilise la classe du style.css
+                    card.className = 'score-card';
 
-                    const listScores = scores.length > 0 
+                    const listScores = scores.length > 0
                         ? scores.map((s, i) => `
                             <div class="score-row">
                                 <span>#${i + 1}</span>
                                 <span class="score-value">${s.score} pts</span>
                                 <span class="score-date">${new Date(s.date).toLocaleDateString('fr-FR')}</span>
-                            </div>`).join('') 
+                            </div>`).join('')
                         : '<p>Aucun score enregistré.</p>';
 
                     card.innerHTML = `
@@ -97,5 +112,7 @@
 
         loadScores();
     </script>
+    <script src="script.js"></script>
 </body>
+
 </html>
