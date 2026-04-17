@@ -26,12 +26,8 @@ export class EnemyManager {
 
     _load(level, maze, caseSize) {
         const configs = enemiesByLevel[level] || [];
-        
-        // 1. Liste de tous tes fichiers disponibles
         let modeles = ["monstre1.glb", "monstre2.glb", "monstre3.glb", "monstre4.glb"];
         
-        // 2. Mélange aléatoire de la liste (Algorithme de Fisher-Yates)
-        // Cela garantit un ordre différent à chaque chargement de niveau
         for (let i = modeles.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [modeles[i], modeles[j]] = [modeles[j], modeles[i]];
@@ -39,10 +35,7 @@ export class EnemyManager {
 
         configs.forEach((config, index) => {
             if (maze[config.row] && maze[config.row][config.col] !== 1) {
-                // 3. On pioche le modèle correspondant à l'index de l'ennemi
-                // Le modulo (%) permet de recommencer la liste si tu as plus de 4 ennemis
                 const modelName = modeles[index % modeles.length];
-                
                 this.enemies.push(new Enemy(
                     this.scene, 
                     maze, 
@@ -96,14 +89,44 @@ export class EnemyManager {
         }
     }
 
+    // NOUVELLE METHODE : Empêche les ennemis de se grimper dessus
+    _resoudreCollisionEntreEnnemis(e1, e2) {
+        const p1 = e1.getPosition();
+        const p2 = e2.getPosition();
+        
+        const delta = p1.subtract(p2);
+        delta.y = 0;
+        
+        const dist = delta.length();
+        const distMin = e1.getCollisionRadius() + e2.getCollisionRadius();
+
+        if (dist < distMin && dist > 0.001) {
+            const penetration = distMin - dist + MARGE_SEPARATION;
+            const direction = delta.scale(1 / dist);
+            const force = direction.scale(penetration / 2);
+            
+            e1.appliquerPoussee(force);
+            e2.appliquerPoussee(force.scale(-1));
+        }
+    }
+
     update(playerRef) {
         const data = this._resolvePlayerData(playerRef);
         if (!data.position) return;
         const now = Date.now();
+
+        // 1. Update et collision joueur
         this.enemies.forEach(e => {
             e.update(data.position);
             this._resoudreContact(e, data, now);
         });
+
+        // 2. Résolution des collisions entre ennemis
+        for (let i = 0; i < this.enemies.length; i++) {
+            for (let j = i + 1; j < this.enemies.length; j++) {
+                this._resoudreCollisionEntreEnnemis(this.enemies[i], this.enemies[j]);
+            }
+        }
     }
 
     dispose() { 
