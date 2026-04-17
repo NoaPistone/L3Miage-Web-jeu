@@ -2,11 +2,11 @@ import Joueur from "../objetsJeu/Joueur.js";
 import Obstacle from "../objetsJeu/Obstacle.js";
 import Piece from "../objetsJeu/Piece.js";
 import Sortie from "../objetsJeu/Sortie.js";
-import { initListeners } from "./ecouteurs.js";
+import { initListeners } from "./ecouteurs.js"; // Même dossier (game/)
 import { drawScore, drawMessage } from "../utils/utils.js";
-import { chargerNiveau } from "./niveaux.js";
+import { chargerNiveau } from "./niveaux.js"; // Même dossier (game/)
 import Ennemi from "../objetsJeu/Ennemi.js";
-import Menu from "../etats/menu.js";
+import Menu from "../etats/Menu.js"; // Vérifie si 'Menu.js' a une majuscule sur ton disque
 import GameOver from "../etats/GameOver.js";
 import BtnDebloqueSortie from "../objetsJeu/BtnDebloqueSortie.js";
 import JeuTermine from "../etats/JeuTermine.js";
