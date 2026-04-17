@@ -121,10 +121,10 @@ export class Joueur {
     async _chargerModele() {
         try {
             const result = await SceneLoader.ImportMeshAsync(
-                "",
-                "/assets/",
-                "character.glb",
-                this.scene
+    "",
+    "assets/",
+    "character.glb",
+    this.scene
             );
 
             const importedRoot = result.meshes[0];

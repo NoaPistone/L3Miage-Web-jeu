@@ -52,7 +52,12 @@ export class Enemy {
 
     async _chargerModele(fileName, row, col) {
         try {
-            const result = await SceneLoader.ImportMeshAsync("", "/assets/monstre/", fileName, this.scene);
+            const result = await SceneLoader.ImportMeshAsync(
+    "", 
+    "assets/monstre/", // Retrait du "/" initial
+    fileName, 
+    this.scene
+);
             this.mesh = result.meshes[0];
             this.mesh.parent = this.root;
             this.mesh.rotation.y = Math.PI;
