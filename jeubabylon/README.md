@@ -19,7 +19,7 @@ La difficulté augmente à chaque niveau avec des labyrinthes plus grands et des
 
 ##  Difficultés rencontrées et Solutions
 
-* **L'algorithme A* et l'ennemi bloqué**
+* **L'algorithme A star et l'ennemi bloqué**
   * *Problème :* A* calcule un chemin sur une grille 2D, mais l'ennemi se déplace dans un espace 3D réel. Ce décalage provoque des situations où A* ordonne à l'ennemi d'avancer, mais le moteur de collision l'en empêche à cause d'un mur. L'ennemi reste alors bloqué à "pédaler dans le vide". Recalculer à chaque frame aggrave le problème car il reçoit sans cesse le même ordre impossible.
   * *Solution :* On limite le recalcul à 1 fois toutes les 20 frames pour alléger le jeu. Pour détecter le blocage, on surveille si l'ennemi a bougé de moins de 0.005 unités sur 15 frames consécutives. Si c'est le cas, il passe en "mode dégagement" : sa direction est tournée de 60° pendant 20 frames pour le faire glisser le long du mur et sortir de son blocage. À courte distance du joueur, il abandonne complètement A* et fonce directement vers lui, ce qui rend la poursuite plus naturelle.
 
