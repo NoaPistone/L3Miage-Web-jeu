@@ -3,69 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puissance 4</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
-    <link rel="apple-touch-icon" href="assets/logo.png">
+    <title>Puissance 4 - Mode ARAM</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo-container">
-            <img src="assets/logo.png" alt="Logo Puissance 4" class="main-logo">
-            <h1>PUISSANCE <span class="p1-text">4</span></h1>
-        </div>
-        <p>Physique Réelle & Rendu SVG</p>
-    </div>
-
-    <div class="scoreboard">
-        <div id="p1-score-card" class="player-score active">
-            <span class="p1-text">Rouge</span>
-            <span id="p1-wins" class="score-val">0</span>
-            <small id="p1-undo-pill">Undo: 1</small>
-        </div>
-        <div id="p2-score-card" class="player-score">
-            <span class="p2-text">Jaune</span>
-            <span id="p2-wins" class="score-val">0</span>
-            <small id="p2-undo-pill">Undo: 1</small>
+    <div id="mode-selector">
+        <div class="modal-content">
+            <h2 style="color: white; margin-bottom: 20px;">CHOISIR LE MODE</h2>
+            <button class="btn-primary" onclick="game.setMode('classic')">CLASSIQUE</button>
+            <button class="btn-primary aram-btn" onclick="game.setMode('aram')">MODE ARAM</button>
         </div>
     </div>
 
-    <div class="status-bar" id="game-status">Tour du Joueur Rouge</div>
-
-    <div class="controls">
-        <button id="btn-undo">Annuler</button>
-        <button class="btn-primary" id="btn-new-round">Nouvelle Manche</button>
-        <button id="btn-reset">Reset Match</button>
-        <div class="toggle-container">
-            <input type="checkbox" id="twist-mode"> <label for="twist-mode">Twist</label>
+    <div class="main-layout">
+        <div id="inventory-p1" class="inventory side-panel">
+            <h3>ROUGE</h3>
+            <div class="special-item" id="p1-exp-cross" onclick="game.selectSpecial('cross')">
+                <div class="disc special-black exp-cross"></div>
+                <span class="count" id="cnt-p1-cross">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Explosion en Croix : Détruit les jetons adjacents (haut, bas, gauche, droite).</span></div>
+            </div>
+            <div class="special-item" id="p1-exp-diag" onclick="game.selectSpecial('diag')">
+                <div class="disc special-black exp-diag"></div>
+                <span class="count" id="cnt-p1-diag">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Explosion Diagonale : Détruit les jetons dans les coins.</span></div>
+            </div>
+            <div class="special-item" id="p1-flash" onclick="game.activateFlash()">
+                <div class="flash-btn">FLASH</div>
+                <span class="count" id="cnt-p1-flash">x1</span>
+                <div class="info-bubble">i<span class="tooltip left">Flashbang : Rend le plateau blanc pour l'adversaire.</span></div>
+            </div>
         </div>
-        <div class="toggle-container">
-            <input type="checkbox" id="sound-toggle" checked> <label for="sound-toggle">Sons</label>
+
+        <div class="game-core">
+            <div class="header">
+                <h1>PUISSANCE <span class="p1-text">4</span></h1>
+                <p id="mode-display">Mode: Classique</p>
+            </div>
+
+            <div class="scoreboard">
+                <div id="p1-score-card" class="player-score active">
+                    <span class="p1-text">Rouge</span>
+                    <span id="p1-wins" class="score-val">0</span>
+                </div>
+                <div id="p2-score-card" class="player-score">
+                    <span class="p2-text">Jaune</span>
+                    <span id="p2-wins" class="score-val">0</span>
+                </div>
+            </div>
+
+            <div class="status-bar" id="game-status">Tour du Joueur Rouge</div>
+
+            <div class="controls">
+                <button id="btn-undo">Annuler</button>
+                <button class="btn-primary" id="btn-new-round">Nouvelle Manche</button>
+                <button id="btn-reset">Reset Match</button>
+                <div class="toggle-container">
+                    <input type="checkbox" id="sound-toggle" checked> <label for="sound-toggle">Sons</label>
+                </div>
+            </div>
+
+            <div class="board-container" id="board-container">
+                <div id="discs-container"></div>
+                <svg id="board-svg" viewBox="0 0 500 430">
+                    <defs>
+                        <mask id="grid-mask">
+                            <rect width="500" height="430" fill="white" />
+                            <g id="mask-holes"></g>
+                        </mask>
+                    </defs>
+                    <rect width="500" height="430" fill="#1e3799" mask="url(#grid-mask)" />
+                </svg>
+                <svg id="win-layer-svg" viewBox="0 0 500 430"><g id="win-highlights-layer"></g></svg>
+                <div id="click-grid" class="click-grid"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="board-container">
-        <div class="board-inner-bg"></div>
-        
-        <div id="discs-container"></div>
-        
-        <svg id="board-svg" viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet">
-            <defs>
-                <mask id="grid-mask">
-                    <rect width="500" height="430" fill="white" />
-                    <g id="mask-holes"></g>
-                </mask>
-            </defs>
-            <rect width="500" height="430" fill="#1e3799" mask="url(#grid-mask)" />
-            <rect width="500" height="430" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="10" />
-        </svg>
-
-        <svg id="win-layer-svg" viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet">
-            <g id="win-highlights-layer"></g>
-        </svg>
-
-        <div id="click-grid" class="click-grid"></div>
+        <div id="inventory-p2" class="inventory side-panel">
+            <h3>JAUNE</h3>
+            <div class="special-item" id="p2-exp-cross" onclick="game.selectSpecial('cross')">
+                <div class="disc special-black exp-cross"></div>
+                <span class="count" id="cnt-p2-cross">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Explosion en Croix : Détruit les jetons adjacents.</span></div>
+            </div>
+            <div class="special-item" id="p2-exp-diag" onclick="game.selectSpecial('diag')">
+                <div class="disc special-black exp-diag"></div>
+                <span class="count" id="cnt-p2-diag">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Explosion Diagonale : Détruit les jetons dans les coins.</span></div>
+            </div>
+            <div class="special-item" id="p2-flash" onclick="game.activateFlash()">
+                <div class="flash-btn">FLASH</div>
+                <span class="count" id="cnt-p2-flash">x1</span>
+                <div class="info-bubble">i<span class="tooltip right">Flashbang : Cache les couleurs au prochain tour.</span></div>
+            </div>
+        </div>
     </div>
 
     <div id="modal">

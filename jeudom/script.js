@@ -1,198 +1,160 @@
 class ConnectFour {
     constructor() {
-        this.ROWS = 6;
-        this.COLS = 7;
-        // Coordonnées absolues pour la zone SVG 500x430
-        this.CELL_SIZE = 60;
-        this.GAP = 10;
-        this.MARGIN_X = 10;
-        this.MARGIN_Y = 10;
-
-        this.board = [];
+        this.ROWS = 6; this.COLS = 7;
+        this.board = Array.from({ length: 6 }, () => Array(7).fill(0));
         this.currentPlayer = 1;
         this.scores = { 1: 0, 2: 0 };
-        this.undosAvailable = { 1: 1, 2: 1 };
-        this.moveStack = [];
+        this.mode = 'classic';
+        this.selectedSpecial = null;
+        this.specials = { 1: { cross: 1, diag: 1, flash: 1 }, 2: { cross: 1, diag: 1, flash: 1 } };
         this.isGameOver = false;
-        this.blockedCol = null;
-        this.blockedTurns = 0;
 
         this.initGrid();
         this.bindEvents();
-        this.initRound();
     }
 
     initGrid() {
         const maskHoles = document.getElementById('mask-holes');
         const clickGrid = document.getElementById('click-grid');
-        
-        clickGrid.innerHTML = '';
-        maskHoles.innerHTML = '';
-
-        for (let c = 0; c < this.COLS; c++) {
-            // Création des colonnes de clic
+        maskHoles.innerHTML = ''; clickGrid.innerHTML = '';
+        for (let c = 0; c < 7; c++) {
             const colEl = document.createElement('div');
-            colEl.addEventListener('mouseenter', () => this.showGhost(c));
-            colEl.addEventListener('mouseleave', () => this.clearGhost());
-            colEl.addEventListener('click', () => this.handleMove(c));
+            colEl.onclick = () => this.handleMove(c);
             clickGrid.appendChild(colEl);
-
-            // Création des trous dans le masque SVG
-            for (let r = 0; r < this.ROWS; r++) {
+            for (let r = 0; r < 6; r++) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                const cx = this.MARGIN_X + (this.CELL_SIZE/2) + c * (this.CELL_SIZE + this.GAP);
-                const cy = this.MARGIN_Y + (this.CELL_SIZE/2) + r * (this.CELL_SIZE + this.GAP);
-                circle.setAttribute("cx", cx);
-                circle.setAttribute("cy", cy);
-                circle.setAttribute("r", this.CELL_SIZE / 2);
-                circle.setAttribute("fill", "black"); // Le noir crée le trou dans le masque
+                circle.setAttribute("cx", 40 + c * 70); circle.setAttribute("cy", 40 + r * 70);
+                circle.setAttribute("r", 30); circle.setAttribute("fill", "black");
                 maskHoles.appendChild(circle);
             }
         }
     }
 
-    bindEvents() {
-        document.getElementById('btn-undo').onclick = () => this.undoMove();
-        document.getElementById('btn-new-round').onclick = () => this.initRound();
-        document.getElementById('btn-reset').onclick = () => this.resetMatch();
-        document.getElementById('btn-modal-reset').onclick = () => this.resetMatch();
-    }
-
-    initRound() {
-        this.board = Array.from({ length: this.ROWS }, () => Array(this.COLS).fill(0));
-        this.isGameOver = false;
-        this.moveStack = [];
-        this.undosAvailable = { 1: 1, 2: 1 };
-        this.blockedCol = null;
-        this.blockedTurns = 0;
-        document.getElementById('discs-container').innerHTML = '';
-        document.getElementById('win-highlights-layer').innerHTML = ''; // Effacer contours victoire
-        this.updateUI();
-    }
-
-    resetMatch() {
-        this.scores = { 1: 0, 2: 0 };
-        document.getElementById('modal').style.display = 'none';
+    setMode(m) {
+        this.mode = m;
+        document.getElementById('mode-selector').style.display = 'none';
         this.initRound();
     }
 
-    handleMove(col) {
-        if (this.isGameOver || col === this.blockedCol) return;
+    initRound() {
+        this.board = Array.from({ length: 6 }, () => Array(7).fill(0));
+        this.isGameOver = false;
+        document.getElementById('discs-container').innerHTML = '';
+        document.getElementById('board-container').classList.remove('flash-active');
+        this.updateUI();
+    }
+
+    selectSpecial(type) {
+        if (this.isGameOver || this.specials[this.currentPlayer][type] === 0) return;
+        this.selectedSpecial = (this.selectedSpecial === type) ? null : type;
+        document.querySelectorAll('.special-item').forEach(el => el.classList.remove('selected'));
+        if (this.selectedSpecial) document.getElementById(`p${this.currentPlayer}-exp-${type}`).classList.add('selected');
+    }
+
+    activateFlash() {
+        if (this.isGameOver || this.specials[this.currentPlayer].flash === 0) return;
+        this.specials[this.currentPlayer].flash = 0;
+        document.getElementById('board-container').classList.add('flash-active');
+        document.getElementById(`p${this.currentPlayer}-flash`).classList.add('used');
+        this.updateUI();
+    }
+
+    async handleMove(col) {
+        if (this.isGameOver) return;
         const row = this.getAvailableRow(col);
         if (row === -1) return;
 
-        this.board[row][col] = this.currentPlayer;
-        const discId = `d-${Date.now()}`;
-        this.moveStack.push({ row, col, player: this.currentPlayer, id: discId });
-        
-        this.dropDisc(row, col, this.currentPlayer, discId);
-        this.playSound('sfx-drop');
+        const p = this.currentPlayer;
+        const spec = this.selectedSpecial;
 
-        const winLine = this.checkWin(row, col);
-        if (winLine) {
-            this.handleWin(winLine);
-        } else if (this.board[0].every(c => c !== 0)) {
-            this.isGameOver = true;
-            document.getElementById('game-status').innerText = "Match Nul !";
+        // Créer le jeton
+        const disc = document.createElement('div');
+        disc.className = `disc ${spec ? 'special-black' : 'player' + p} ${spec ? 'exp-' + spec : ''}`;
+        disc.style.left = `${10 + col * 70}px`;
+        disc.style.transform = `translateY(-100px)`;
+        document.getElementById('discs-container').appendChild(disc);
+
+        // Animation de chute
+        requestAnimationFrame(() => disc.style.transform = `translateY(${10 + row * 70}px)`);
+        
+        if (spec) {
+            this.specials[p][spec] = 0;
+            document.getElementById(`p${p}-exp-${spec}`).classList.add('used');
+            this.selectedSpecial = null;
+            document.querySelectorAll('.special-item').forEach(el => el.classList.remove('selected'));
+            
+            await new Promise(r => setTimeout(r, 650));
+            this.executeExplosion(row, col, spec);
         } else {
-            this.processTwist();
-            this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+            this.board[row][col] = p;
+            disc.setAttribute('data-pos', `${row}-${col}`);
+        }
+
+        const win = this.checkWin();
+        if (win) {
+            this.isGameOver = true;
+            this.scores[p]++;
+            setTimeout(() => { document.getElementById('modal').style.display = 'flex'; }, 500);
+        } else {
+            this.currentPlayer = p === 1 ? 2 : 1;
+            document.getElementById('board-container').classList.remove('flash-active');
             this.updateUI();
         }
     }
 
-    getAvailableRow(col) {
-        for (let r = this.ROWS - 1; r >= 0; r--) {
-            if (this.board[r][col] === 0) return r;
-        }
-        return -1;
-    }
-
-    dropDisc(row, col, player, id) {
-        const container = document.getElementById('discs-container');
-        const disc = document.createElement('div');
-        disc.className = `disc player${player}`;
-        disc.id = id;
-        
-        const x = this.MARGIN_X + col * (this.CELL_SIZE + this.GAP);
-        const y = this.MARGIN_Y + row * (this.CELL_SIZE + this.GAP);
-        
-        disc.style.left = `${x}px`;
-        disc.style.transform = `translateY(-80px)`; // Départ hors champ
-        container.appendChild(disc);
-
-        // Transition de chute
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                disc.style.transform = `translateY(${y}px)`;
-            });
+    executeExplosion(r, c, type) {
+        let targets = (type === 'cross') ? [[r-1, c], [r+1, c], [r, c-1], [r, c+1]] : [[r-1, c-1], [r-1, c+1], [r+1, c-1], [r+1, c+1]];
+        targets.forEach(([tr, tc]) => {
+            if (tr >= 0 && tr < 6 && tc >= 0 && tc < 7) {
+                const targetDisc = document.querySelector(`.disc[data-pos="${tr}-${tc}"]`);
+                if (targetDisc) targetDisc.classList.add('exploding');
+                this.board[tr][tc] = 0;
+            }
         });
+        setTimeout(() => this.applyGravity(), 400);
     }
 
-    handleWin(line) {
-        this.isGameOver = true;
-        this.scores[this.currentPlayer]++;
-        this.playSound('sfx-win');
-        
-        // --- MODIFICATION ICI pour encadrement BLANC par-dessus ---
-        setTimeout(() => {
-            const winLayer = document.getElementById('win-highlights-layer');
-            line.forEach(pos => {
-                // Créer un cercle SVG pour le contour blanc
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                const cx = this.MARGIN_X + (this.CELL_SIZE/2) + pos.c * (this.CELL_SIZE + this.GAP);
-                const cy = this.MARGIN_Y + (this.CELL_SIZE/2) + pos.r * (this.CELL_SIZE + this.GAP);
-                circle.setAttribute("cx", cx);
-                circle.setAttribute("cy", cy);
-                circle.setAttribute("r", this.CELL_SIZE / 2 - 1); // Légèrement plus petit que le trou
-                circle.classList.add('win-ring'); // Classe CSS pour le stroke blanc lumineux
-                winLayer.appendChild(circle);
-            });
-        }, 610); // Attend la fin de la chute
-        // -----------------------------------------------------------
-
-        this.updateUI();
-        if (this.scores[this.currentPlayer] >= 2) {
-            setTimeout(() => {
-                const winnerColor = this.currentPlayer === 1 ? "Rouge" : "Jaune";
-                document.getElementById('modal-title').innerText = `Le Joueur ${winnerColor} Gagne !`;
-                document.getElementById('modal').style.display = 'flex';
-            }, 1500);
+    applyGravity() {
+        for (let c = 0; c < 7; c++) {
+            let column = [];
+            for (let r = 0; r < 6; r++) if (this.board[r][c] !== 0) column.push(this.board[r][c]);
+            for (let r = 5; r >= 0; r--) this.board[r][c] = column.length > 0 ? column.pop() : 0;
         }
+        this.redraw();
     }
 
-    showGhost(col) {
-        if (this.isGameOver || col === this.blockedCol) return;
-        const row = this.getAvailableRow(col);
-        if (row === -1) return;
-
+    redraw() {
         const container = document.getElementById('discs-container');
-        const ghost = document.createElement('div');
-        ghost.className = `disc player${this.currentPlayer} ghost`;
-        ghost.id = 'ghost-disc';
-        
-        const x = this.MARGIN_X + col * (this.CELL_SIZE + this.GAP);
-        const y = this.MARGIN_Y + row * (this.CELL_SIZE + this.GAP);
-        
-        ghost.style.left = `${x}px`;
-        ghost.style.transform = `translateY(${y}px)`;
-        container.appendChild(ghost);
+        container.innerHTML = '';
+        this.board.forEach((row, r) => row.forEach((p, c) => {
+            if (p !== 0) {
+                const d = document.createElement('div');
+                d.className = `disc player${p}`;
+                d.setAttribute('data-pos', `${r}-${c}`);
+                d.style.left = `${10 + c * 70}px`;
+                d.style.transform = `translateY(${10 + r * 70}px)`;
+                container.appendChild(d);
+            }
+        }));
     }
 
-    clearGhost() {
-        const ghost = document.getElementById('ghost-disc');
-        if (ghost) ghost.remove();
-    }
+    getAvailableRow(c) { for (let r = 5; r >= 0; r--) if (this.board[r][c] === 0) return r; return -1; }
 
-    undoMove() {
-        if (this.moveStack.length === 0 || this.isGameOver) return;
-        if (this.undosAvailable[this.currentPlayer] <= 0) return;
-        const last = this.moveStack.pop();
-        this.board[last.row][last.col] = 0;
-        this.undosAvailable[this.currentPlayer]--;
-        const el = document.getElementById(last.id);
-        if(el) el.remove();
-        this.updateUI();
+    checkWin() {
+        for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 7; c++) {
+                const p = this.board[r][c]; if (p === 0) continue;
+                for (let [dr, dc] of [[0,1],[1,0],[1,1],[1,-1]]) {
+                    let count = 1;
+                    for (let i = 1; i < 4; i++) {
+                        let nr = r+dr*i, nc = c+dc*i;
+                        if (nr>=0 && nr<6 && nc>=0 && nc<7 && this.board[nr][nc]===p) count++; else break;
+                    }
+                    if (count >= 4) return true;
+                }
+            }
+        }
+        return false;
     }
 
     updateUI() {
@@ -200,50 +162,19 @@ class ConnectFour {
         document.getElementById('p2-wins').innerText = this.scores[2];
         document.getElementById('p1-score-card').classList.toggle('active', this.currentPlayer === 1);
         document.getElementById('p2-score-card').classList.toggle('active', this.currentPlayer === 2);
-        document.getElementById('p1-undo-pill').innerText = `Undo: ${this.undosAvailable[1]}`;
-        document.getElementById('p2-undo-pill').innerText = `Undo: ${this.undosAvailable[2]}`;
-        
-        if (!this.isGameOver) {
-            const playerColor = this.currentPlayer === 1 ? "Rouge" : "Jaune";
-            document.getElementById('game-status').innerText = `Tour du Joueur ${playerColor}`;
-        }
+        ['cross','diag','flash'].forEach(t => {
+            document.getElementById(`cnt-p1-${t}`).innerText = `x${this.specials[1][t]}`;
+            document.getElementById(`cnt-p2-${t}`).innerText = `x${this.specials[2][t]}`;
+        });
     }
 
-    checkWin(r, c) {
-        const p = this.board[r][c];
-        const dirs = [[[0,1],[0,-1]], [[1,0],[-1,0]], [[1,1],[-1,-1]], [[1,-1],[-1,1]]];
-        for (let d of dirs) {
-            let line = [{r, c}];
-            for (let [dr, dc] of d) {
-                let nr = r + dr, nc = c + dc;
-                while (nr >= 0 && nr < this.ROWS && nc >= 0 && nc < this.COLS && this.board[nr][nc] === p) {
-                    line.push({r: nr, c: nc});
-                    nr += dr; nc += dc;
-                }
-            }
-            if (line.length >= 4) return line;
-        }
-        return null;
-    }
-
-    processTwist() {
-        if (!document.getElementById('twist-mode').checked) { this.blockedCol = null; return; }
-        if (this.blockedTurns > 0) {
-            this.blockedTurns--;
-            if (this.blockedTurns === 0) this.blockedCol = null;
-        } else if (Math.random() < 0.15) {
-            this.blockedCol = Math.floor(Math.random() * this.COLS);
-            this.blockedTurns = 3;
-            alert("Une colonne a été bloquée par le sort !");
-        }
-    }
-
-    playSound(id) {
-        if (document.getElementById('sound-toggle').checked) {
-            const s = document.getElementById(id);
-            if(s) { s.currentTime = 0; s.play().catch(() => {}); }
-        }
+    bindEvents() {
+        document.getElementById('btn-new-round').onclick = () => this.initRound();
+        document.getElementById('btn-modal-reset').onclick = () => {
+            this.scores = { 1: 0, 2: 0 };
+            document.getElementById('modal').style.display = 'none';
+            this.initRound();
+        };
     }
 }
-
-new ConnectFour();
+const game = new ConnectFour();
