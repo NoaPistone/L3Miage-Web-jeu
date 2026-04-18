@@ -2,11 +2,11 @@ import Joueur from "../objetsJeu/Joueur.js";
 import Obstacle from "../objetsJeu/Obstacle.js";
 import Piece from "../objetsJeu/Piece.js";
 import Sortie from "../objetsJeu/Sortie.js";
-import { initListeners } from "./ecouteurs.js"; // Même dossier (game/)
+import { initListeners } from "./ecouteurs.js";
 import { drawScore, drawMessage } from "../utils/utils.js";
-import { chargerNiveau } from "./niveaux.js"; // Même dossier (game/)
+import { chargerNiveau } from "./niveaux.js"; 
 import Ennemi from "../objetsJeu/Ennemi.js";
-import Menu from "../etats/Menu.js"; // Vérifie si 'Menu.js' a une majuscule sur ton disque
+import Menu from "../etats/Menu.js"; 
 import GameOver from "../etats/GameOver.js";
 import BtnDebloqueSortie from "../objetsJeu/BtnDebloqueSortie.js";
 import JeuTermine from "../etats/JeuTermine.js";
@@ -129,7 +129,6 @@ export default class Jeux {
         });
         if (this.vies <= 0) {
             this.etat = "GAME OVER";
-            //this.fin.envoyerScore();
             this.timerActif = false;
             this.tempsNiveau = 0
             console.log("jeu terminé");

@@ -89,7 +89,7 @@ export class EnemyManager {
         }
     }
 
-    // NOUVELLE METHODE : Empêche les ennemis de se grimper dessus
+    
     _resoudreCollisionEntreEnnemis(e1, e2) {
         const p1 = e1.getPosition();
         const p2 = e2.getPosition();
@@ -115,13 +115,13 @@ export class EnemyManager {
         if (!data.position) return;
         const now = Date.now();
 
-        // 1. Update et collision joueur
+        
         this.enemies.forEach(e => {
             e.update(data.position);
             this._resoudreContact(e, data, now);
         });
 
-        // 2. Résolution des collisions entre ennemis
+        
         for (let i = 0; i < this.enemies.length; i++) {
             for (let j = i + 1; j < this.enemies.length; j++) {
                 this._resoudreCollisionEntreEnnemis(this.enemies[i], this.enemies[j]);

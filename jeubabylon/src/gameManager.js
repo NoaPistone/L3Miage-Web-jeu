@@ -245,7 +245,7 @@ export class GameManager {
                     window.close();
                 };
 
-                // Bouton menu principal
+                
                 document.getElementById("finMenuBtn").onclick = () => {
                     document.getElementById("finJeu").classList.add("hidden");
                     document.getElementById("hudDroit").style.display = "none";
@@ -281,34 +281,6 @@ export class GameManager {
 
     }
 
-    /*nextLevel() {
-        if (this.enTransition) return;
-        this.enTransition = true;
-
-        this.scoreManager.supprimerFleche();
-        this.player.desactiverBoost();
-
-        this.currentLevel++;
-
-        if (this.currentLevel >= this.levels.length) {
-            console.log("🏆 Jeu terminé !");
-            this.currentLevel = this.levels.length - 1;
-            this.enTransition = false;
-            return;
-        }
-
-        const transition = document.getElementById("transition");
-        transition.classList.add("fadeIn");
-
-        setTimeout(() => {
-            this.startLevel();
-
-            setTimeout(() => {
-                transition.classList.remove("fadeIn");
-                this.enTransition = false;
-            }, 300);
-        }, 800);
-    }*/
 
     startChrono() {
         if (this.chronoInterval) clearInterval(this.chronoInterval);
@@ -358,7 +330,7 @@ export class GameManager {
 
                 root.scaling = new Vector3(0.20, 0.13, 0.09);
 
-                // Force Babylon à recalculer les matrices
+                
                 this.scene.executeWhenReady(() => {
                     const bounds = root.getHierarchyBoundingVectors();
 
@@ -366,18 +338,17 @@ export class GameManager {
                     const centerZ = (bounds.min.z + bounds.max.z) / 2;
                     const bottomY = bounds.min.y;
 
-                    // On recentre les enfants autour de root
+                    
                     root.getChildMeshes().forEach((child) => {
                         child.position.x -= centerX;
                         child.position.y -= bottomY;
                         child.position.z -= centerZ;
                     });
 
-                    // Puis on place root exactement sur la sortie
+                    
                     root.position = new Vector3(posX, 0, posZ);
 
-                    // Si l’escalier regarde dans le mauvais sens, décommente :
-                    // root.rotation.y = Math.PI;
+                    
 
                     this.escalierMesh = root;
                 });

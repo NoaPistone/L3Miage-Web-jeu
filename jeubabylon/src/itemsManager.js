@@ -1,4 +1,3 @@
-// ItemManager.js
 import { SceneLoader, TransformNode } from "@babylonjs/core";
 import { itemsByLevel } from "./items";
 
@@ -16,7 +15,7 @@ export class ItemManager {
 
     _load(level, mazeGrid) {
         const levelItems = itemsByLevel[level] || [];
-        console.log(`📦 Items pour le niveau ${level} :`, levelItems); // 👈
+        console.log(`📦 Items pour le niveau ${level} :`, levelItems); 
 
         const totalSize = this.mazeHeight * this.caseSize;
         levelItems.forEach(item => {
@@ -26,11 +25,11 @@ export class ItemManager {
             SceneLoader.ImportMesh("", item.model, "", this.scene, (meshes) => {
                 const pivot = new TransformNode("pivot_" + Date.now(), this.scene);
                 pivot.position.set(posX, 0.8, posZ);
-                pivot.scaling.setAll(item.scale || 0.2); // 👈 scale sur le pivot
+                pivot.scaling.setAll(item.scale || 0.2);
 
                 meshes.forEach(m => {
                     m.rotationQuaternion = null;
-                    m.rotation.set(item.rotationX || 0, 0, 0); // 👈 utilise rotationX si défini
+                    m.rotation.set(item.rotationX || 0, 0, 0); 
                     m.parent = pivot;
                 });
 
@@ -39,7 +38,7 @@ export class ItemManager {
         });
     }
 
-    // À appeler à chaque frame dans GameManager.update()
+    
     update(playerPosition) {
         this.items = this.items.filter(item => {
             if (!item.root) return false;
@@ -53,7 +52,7 @@ export class ItemManager {
             const dist = Math.sqrt(dx * dx + dz * dz);
 
             if (dist < COLLECT_RADIUS) {
-                item.root.dispose(false, true); // 👈 dispose le pivot ET tous ses enfants d'un coup
+                item.root.dispose(false, true); 
                 if (this.scoreManager) {
                     this.scoreManager.addPoints(item.type);
                 }
@@ -63,7 +62,7 @@ export class ItemManager {
             return true;
         });
     }
-    // À appeler quand on change de niveau pour nettoyer les items restants
+    
     dispose() {
         this.items.forEach(item => {
             item.meshes.forEach(m => m.dispose());

@@ -42,7 +42,7 @@ btnAction.onclick = async () => {
   const mdp = document.getElementById('password').value;
   errorMsg.innerText = '';
 
-  //const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+  
   const endpoint = isLoginMode
     ? 'https://projetswebmiagel3.onrender.com/api/auth/login'
     : 'https://projetswebmiagel3.onrender.com/api/auth/register';
