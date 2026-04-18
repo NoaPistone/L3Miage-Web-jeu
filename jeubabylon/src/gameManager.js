@@ -227,7 +227,7 @@ export class GameManager {
 
                 const token = localStorage.getItem('token');
                 if (token) {
-                    fetch('/api/scores', {
+                    fetch('https://projetswebmiagel3.onrender.com/api/scores', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

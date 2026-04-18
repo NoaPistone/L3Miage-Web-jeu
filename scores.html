@@ -58,7 +58,7 @@
     </footer>
 
     <script>
-        const NOMS = { jeu1: 'Jeu Canvas 2D', jeu2: 'Jeu Babylon.js' };
+        const NOMS = { jeu1: 'NEON ESCAPE', jeu2: 'LE LABYRINTHE' };
 
         async function loadScores() {
             const token = localStorage.getItem('token');
@@ -71,7 +71,7 @@
             }
 
             try {
-                const res = await fetch('/api/scores', {
+                const res = await fetch('https://projetswebmiagel3.onrender.com/api/scores', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
 

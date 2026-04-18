@@ -18,7 +18,7 @@ export default class JeuTermine {
     envoyerScore() {
         const token = localStorage.getItem('token');
         if (!token) return;
-        fetch('/api/scores', {
+        fetch('https://projetswebmiagel3.onrender.com/api/scores', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
