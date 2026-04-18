@@ -1,5 +1,5 @@
-function getToken()  { return localStorage.getItem('token'); }
-function getUser()   { return localStorage.getItem('pseudo'); }
+function getToken() { return localStorage.getItem('token'); }
+function getUser() { return localStorage.getItem('pseudo'); }
 
 function updateLoginIcon() {
   const icon = document.getElementById('login-icon');
@@ -7,12 +7,12 @@ function updateLoginIcon() {
   icon.title = getUser() ? getUser() : 'Se connecter';
 }
 
-const authModal  = document.getElementById('auth-modal');
-const loginIcon  = document.getElementById('login-icon');
-const btnAction  = document.getElementById('btn-action');
-const errorMsg   = document.getElementById('auth-error');
+const authModal = document.getElementById('auth-modal');
+const loginIcon = document.getElementById('login-icon');
+const btnAction = document.getElementById('btn-action');
+const errorMsg = document.getElementById('auth-error');
 const toggleAuth = document.getElementById('toggle-auth');
-let isLoginMode  = true;
+let isLoginMode = true;
 
 loginIcon.onclick = () => {
   if (getUser()) {
@@ -39,12 +39,15 @@ toggleAuth.onclick = () => {
 
 btnAction.onclick = async () => {
   const pseudo = document.getElementById('username').value.trim();
-  const mdp    = document.getElementById('password').value;
+  const mdp = document.getElementById('password').value;
   errorMsg.innerText = '';
 
-  const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+  //const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+  const endpoint = isLoginMode
+    ? 'https://projetswebmiagel3.onrender.com/api/auth/login'
+    : 'https://projetswebmiagel3.onrender.com/api/auth/register';
   try {
-    const res  = await fetch(endpoint, {
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pseudo, mdp })
@@ -53,7 +56,7 @@ btnAction.onclick = async () => {
     if (!res.ok) { errorMsg.innerText = data.error; return; }
 
     if (isLoginMode) {
-      localStorage.setItem('token',  data.token);
+      localStorage.setItem('token', data.token);
       localStorage.setItem('pseudo', data.pseudo);
       authModal.style.display = 'none';
       updateLoginIcon();

@@ -2,7 +2,7 @@ async function submitScore(jeu, score) {
   const token = localStorage.getItem('token');
   if (!token) return;
   try {
-    await fetch('/api/scores', {
+    await fetch('https://projetswebmiagel3.onrender.com/api/scores', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
