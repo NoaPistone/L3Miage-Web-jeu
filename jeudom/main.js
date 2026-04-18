@@ -129,16 +129,19 @@ class ConnectFour {
                 this.flashActive = true;
             }
 
-            if (this.game.checkWin()) {
-                setTimeout(() => {
-                    this.handleWin(p);
-                }, 1000);
+            const winner = this.game.checkWin(); 
+
+            if (winner !== 0) {
                 
+                setTimeout(() => {
+                    this.handleWin(winner); 
+                }, 1000);
+
             } else if (this.game.checkDraw()) {
                 setTimeout(() => {
                     this.handleDraw();
                 }, 1000);
-                
+
             } else {
                 this.game.currentPlayer = p === 1 ? 2 : 1;
                 if (this.flashActive) document.getElementById('board-container').classList.add('flash-active');
@@ -170,19 +173,20 @@ class ConnectFour {
         await new Promise(r => setTimeout(r, 400));
         this.game.applyGravity();
         UI.redraw(this.game.board);
-
         await new Promise(r => setTimeout(r, 300));
 
-        if (this.game.checkWin()) {
+        const winner = this.game.checkWin(); 
+
+        if (winner !== 0) {
             setTimeout(() => {
-                this.handleWin(this.game.currentPlayer);
+                this.handleWin(winner);
             }, 1200);
         } else if (this.game.checkDraw()) {
             setTimeout(() => {
                 this.handleDraw();
             }, 1000);
         } else {
-            
+
             this.game.currentPlayer = this.game.currentPlayer === 1 ? 2 : 1;
             this.updateGlobalUI();
         }

@@ -35,11 +35,12 @@ export class Game {
                         if (nr >= 0 && nr < 6 && nc >= 0 && nc < 7 && this.board[nr][nc] === p) count++;
                         else break;
                     }
-                    if (count >= 4) return true;
+                    
+                    if (count >= 4) return p;
                 }
             }
         }
-        return false;
+        return 0; 
     }
 
     checkDraw() {
