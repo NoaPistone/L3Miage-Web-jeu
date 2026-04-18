@@ -20,12 +20,20 @@ app.listen(process.env.PORT || 3000, () => {
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
+const cors = require('cors');  // ← AJOUTER
 dotenv.config();
 
 const connectDB = require('./connect_db/connect_db');
 connectDB();
 
 const app = express();
+
+// ← AJOUTER CES LIGNES
+app.use(cors({
+  origin: "https://l3-miage-web-home-page.vercel.app"
+}));
+
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../')));
 
