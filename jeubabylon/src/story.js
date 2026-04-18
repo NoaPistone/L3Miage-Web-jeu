@@ -11,6 +11,4 @@ export const LEVEL_INTROS = [
     "Les couloirs s'allongent, se replient et se répètent. L'ombre qui te suit se rapproche, plus insistante.",
     "Les chemins se multiplient et des silhouettes semblent te suivre dans l'ombre. Reste attentif, chaque pas peut être dangereux.",
     "Des présences rôdent tout autour de toi. Garde les yeux ouverts… le labyrinthe ne pardonne aucun faux pas.",
-    null,
-    null,
 ];

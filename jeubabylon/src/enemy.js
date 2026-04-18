@@ -54,7 +54,7 @@ export class Enemy {
         try {
             const result = await SceneLoader.ImportMeshAsync(
     "", 
-    "assets/monstre/", // Retrait du "/" initial
+    "assets/monstre/", 
     fileName, 
     this.scene
 );
@@ -97,11 +97,11 @@ export class Enemy {
     appliquerPoussee(pushVector) {
         if (!this.collider || !pushVector) return;
         const push = pushVector.clone();
-        push.y = 0; // Sécurité : pas de poussée verticale
+        push.y = 0; 
         
         this.collider.moveWithCollisions(push);
         
-        // SÉCURITÉ ANTI-ENVOL : On force le Y à rester constant après la poussée
+        
         if (this.collider.position.y !== 0.9) {
             this.collider.position.y = 0.9;
         }
@@ -158,7 +158,7 @@ export class Enemy {
 
         this.collider.moveWithCollisions(direction.scale(Math.min(VITESSE, distCible)));
         
-        // Sécurité supplémentaire pendant le déplacement normal
+        
         if (this.collider.position.y !== 0.9) {
             this.collider.position.y = 0.9;
         }

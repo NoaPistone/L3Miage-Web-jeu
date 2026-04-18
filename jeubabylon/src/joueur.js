@@ -32,20 +32,19 @@ export class Joueur {
         this.boostActif = false;
         this.boostTimeout = null;
 
-        // --- REGLAGES CAMERA CORRIGÉS ---
-        // On augmente l'offset pour ne pas voir l'intérieur du crâne
+       
         this.camForwardIdle = 0.22; 
         this.camForwardRun = 0.30;
         this.currentCamForward = this.camForwardIdle;
         this.camHeightOffset = 0.08;
 
-        // Animations
+        
         this.animationGroups = [];
         this.animStanding = null;
         this.animRunning = null;
         this.animActuelle = null;
 
-        // --- COLLIDER (ELLIPSOIDE AGRANDI) ---
+        
         this.collider = MeshBuilder.CreateBox(
             "playerCollider",
             { width: 0.8, depth: 0.8, height: 1.8 },
@@ -55,7 +54,7 @@ export class Joueur {
         this.collider.position = new Vector3(0, 0.9, 0);
         this.collider.checkCollisions = true;
         
-        // On augmente légèrement le rayon (0.45) pour empêcher la caméra de coller aux murs
+        
         this.collider.ellipsoid = new Vector3(0.45, 0.9, 0.45); 
         this.collider.ellipsoidOffset = new Vector3(0, 0.9, 0);
 
@@ -68,8 +67,7 @@ export class Joueur {
             this.scene
         );
 
-        // --- CORRECTION NEAR CLIP ---
-        // minZ à 0.01 permet de ne pas faire disparaître les murs quand on est collé
+        
         this.camera.minZ = 0.01; 
         this.camera.fov = 1.1;
         this.camera.inputs.clear();
@@ -177,7 +175,7 @@ export class Joueur {
             Math.cos(this.yaw)
         );
 
-        // On force le recalcul pour éviter que la caméra "lag" derrière l'animation
+       
         this.root?.computeWorldMatrix(true);
         if (this.bodyMesh) this.bodyMesh.computeWorldMatrix(true);
 
@@ -224,7 +222,7 @@ export class Joueur {
                 this._jouerAnimation(this.animStanding);
             }
 
-            // Smoothing de la position caméra
+           
             const cibleOffset = enMouvement ? this.camForwardRun : this.camForwardIdle;
             this.currentCamForward += (cibleOffset - this.currentCamForward) * 0.15;
 

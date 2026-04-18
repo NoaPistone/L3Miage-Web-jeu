@@ -14,27 +14,7 @@ function auth(req, res, next) {
     }
 }
 
-/*router.post('/', auth, async (req, res) => {
-  try {
-    const { jeu, score } = req.body;
-    const { pseudo } = req.user;
 
-    const existing = await Score.findOne({ pseudo, jeu });
-    if (existing) {
-      if (score > existing.score) {
-        existing.score = score;
-        existing.date = new Date();
-        await existing.save();
-        return res.json({ updated: true, score });
-      }
-      return res.json({ updated: false, score: existing.score });
-    }
-    await Score.create({ pseudo, jeu, score });
-    res.json({ updated: true, score });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});*/
 
 router.post('/', auth, async (req, res) => {
     try {
@@ -56,8 +36,8 @@ router.get('/', auth, async (req, res) => {
         const result = {};
         for (const jeu of jeux) {
             const scores = await Score.find({ pseudo, jeu })
-                .sort({ score: -1 }) // meilleur score en premier
-                .limit(3)            // top 3
+                .sort({ score: -1 }) 
+                .limit(3)            
                 .select('pseudo score date -_id');
 
             result[jeu] = scores;
