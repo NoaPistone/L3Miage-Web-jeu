@@ -6,6 +6,8 @@
 
 ## Lien du site pour les jeux : https://l3-miage-web-home-page.vercel.app
 
+## Lien video youtube : https://youtu.be/Zm55_kCVMo4
+
 ---
 
 ## Présentation du projet
